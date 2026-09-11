@@ -54,7 +54,7 @@ export default function Logo({ size = 38, tone = "color", stacked = false, spin 
 
   const word = (
     <span
-      className={`font-display font-extrabold leading-none tracking-tight ${wordClass}`}
+      className={`whitespace-nowrap font-display font-extrabold leading-none tracking-tight ${wordClass}`}
       style={{ fontSize }}
     >
       Kalvi Thun<span className={aiClass}>AI</span>

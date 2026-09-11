@@ -77,10 +77,10 @@ export default function PhoneDemo({ onStageChange, onGrad = false, reserveY }) {
     setStage("detail");
   }
 
-  const nextConcept =
-    chapter && concept
-      ? chapter.concepts[chapter.concepts.findIndex((c) => c.id === concept.id) + 1]
-      : null;
+  const conceptIndex =
+    chapter && concept ? chapter.concepts.findIndex((c) => c.id === concept.id) : -1;
+  const nextConcept = conceptIndex >= 0 ? chapter.concepts[conceptIndex + 1] : null;
+  const prevConcept = conceptIndex > 0 ? chapter.concepts[conceptIndex - 1] : null;
 
   return (
     <LangContext.Provider value={{ lang, setLang }}>
@@ -173,16 +173,25 @@ export default function PhoneDemo({ onStageChange, onGrad = false, reserveY }) {
             onBack={back}
             onPlay={() => setAvOpen(true)}
             onNext={nextConcept ? () => setConcept(nextConcept) : null}
+            onPrev={prevConcept ? () => setConcept(prevConcept) : null}
+            onCheckWork={() => setAiOpen(true)}
           />
         )}
 
-        {avOpen && concept ? <AvPlayer concept={concept} onClose={() => setAvOpen(false)} /> : null}
+        {avOpen && concept ? (
+          <AvPlayer
+            concept={concept}
+            classItem={classItem}
+            subject={subject}
+            onClose={() => setAvOpen(false)}
+          />
+        ) : null}
 
         {aiOpen ? (
           <AiCheck onClose={() => setAiOpen(false)} onOpenConcept={openConcept} />
         ) : null}
 
-        {stage !== "auth" && !avOpen && !aiOpen ? (
+        {stage !== "auth" && stage !== "detail" && !avOpen && !aiOpen ? (
           <button
             onClick={() => setAiOpen(true)}
             aria-label="Check my work"

@@ -1,6 +1,7 @@
 // Sample curriculum used by the in-page phone demo.
-// Shape: raw[class][subjectId] = [ [chapterTitle, [ [concept, summary, keyLine, "step | step | step", avType] ] ] ]
+// Shape: raw[class][subjectId] = [ [chapterTitle, [ [concept, summary, keyLine, "step | step | step", avType, youtubeId?] ] ] ]
 // avType drives the little animation in the audio-visual player: bar | grid | cycle | stack | map
+// youtubeId is optional. Add one and the player shows the video tab for that concept.
 
 import { seniorRaw } from "./senior";
 
@@ -372,7 +373,7 @@ function expand(source) {
         id: `${cls}-${subjectId}-${ci + 1}`,
         number: ci + 1,
         title,
-        concepts: concepts.map(([name, summary, formula, steps, av], ni) => ({
+        concepts: concepts.map(([name, summary, formula, steps, av, video], ni) => ({
           id: `${cls}-${subjectId}-${ci + 1}-${ni + 1}`,
           number: `${ci + 1}.${ni + 1}`,
           name,
@@ -380,6 +381,7 @@ function expand(source) {
           formula,
           steps: steps.split(" | "),
           av,
+          video: video ?? null,
         })),
       }));
     });

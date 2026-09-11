@@ -88,6 +88,8 @@ const STR = {
   audioVisual: { en: "Audio visual", ta: "ஒளி ஒலி" },
   steps: { en: "steps", ta: "படிகள்" },
   nextConcept: { en: "Next concept", ta: "அடுத்த கருத்து" },
+  prevConcept: { en: "Previous concept", ta: "முந்தைய கருத்து" },
+  backWord: { en: "Back", ta: "பின்" },
   doubtNote: {
     en: "Stuck here? Ask a doubt and a teacher replies within a day.",
     ta: "சந்தேகமா? கேளுங்கள், ஒரு நாளுக்குள் ஆசிரியர் பதிலளிப்பார்.",
@@ -103,6 +105,14 @@ const STR = {
   playAgain: { en: "Play again", ta: "மீண்டும் இயக்கு" },
   next: { en: "Next", ta: "அடுத்து" },
   closeExample: { en: "Close the example", ta: "எடுத்துக்காட்டை மூடு" },
+  tabVideo: { en: "Video", ta: "விடியோ" },
+  tabSteps: { en: "Steps", ta: "படிகள்" },
+  noVideoYet: {
+    en: "No video linked to this concept yet.",
+    ta: "இந்தக் கருத்துக்கு விடியோ இன்னும் இணைக்கப்படவில்லை.",
+  },
+  searchYouTube: { en: "Find one on YouTube", ta: "YouTube இல் தேடு" },
+  findingVideo: { en: "Finding a video", ta: "விடியோ தேடப்படுகிறது" },
   goBack: { en: "Go back", ta: "பின் செல்" },
 
   // check my work
@@ -112,6 +122,11 @@ const STR = {
     ta: "உங்கள் நோட்டில் உள்ள கணக்கை கேமராவில் காட்டுங்கள்.",
   },
   takePhoto: { en: "Take photo", ta: "படம் எடு" },
+  uploadPhoto: { en: "Upload photo", ta: "படத்தை பதிவேற்று" },
+  chooseFile: {
+    en: "Choose a photo of your worked answer.",
+    ta: "நீங்கள் எழுதிய வினாவின் படத்தைத் தேர்ந்தெடுங்கள்.",
+  },
   readingSteps: { en: "Reading your steps", ta: "உங்கள் படிகளைப் படிக்கிறது" },
   yourWorking: { en: "What you wrote", ta: "நீங்கள் எழுதியது" },
   whereItBroke: { en: "Where it went wrong", ta: "எங்கே தவறியது" },
@@ -126,6 +141,20 @@ const STR = {
     ta: "விடை காட்டப்படவில்லை. அடுத்த படியை நீங்களே செய்யுங்கள்.",
   },
   fromClass: { en: "Class", ta: "வகுப்பு" },
+
+  // ask a doubt
+  askTitle: { en: "Ask a doubt", ta: "சந்தேகம் கேளுங்கள்" },
+  askBar: { en: "Ask AI about your doubts", ta: "உங்கள் சந்தேகங்களை AI இடம் கேளுங்கள்" },
+  askPlaceholder: { en: "Ask AI about your doubts", ta: "உங்கள் சந்தேகங்களை AI இடம் கேளுங்கள்" },
+  askSend: { en: "Send", ta: "அனுப்பு" },
+  askIntro: {
+    en: "Ask anything about this concept. Answers come from your textbook material, so they match what your teacher taught.",
+    ta: "இந்தக் கருத்து பற்றி எதையும் கேட்கலாம். பதில்கள் உங்கள் பாடப்புத்தகத்திலிருந்தே வரும்.",
+  },
+  askGuard: {
+    en: "Answers give the next step, never the final answer.",
+    ta: "பதில் அடுத்த படியை மட்டுமே காட்டும், விடையை அல்ல.",
+  },
 };
 
 export function t(key, lang) {

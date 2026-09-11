@@ -167,7 +167,7 @@ export default function OtpScreen({ onDone }) {
               setError("");
             }}
           />
-          <Logo size={44} tone="mono" />
+          <Logo size={38} tone="mono" />
           <span className="ml-auto">
             <LangToggle dark />
           </span>
@@ -192,7 +192,7 @@ export default function OtpScreen({ onDone }) {
             </span>
           </div>
 
-          {error ? <p className="mt-2 text-[12px] text-alert">{error}</p> : null}
+          <p className="mt-2 min-h-[18px] text-[12px] text-alert">{error}</p>
 
           <div className="mt-auto pb-9">
             <Keypad onKey={press} />
@@ -202,7 +202,7 @@ export default function OtpScreen({ onDone }) {
             >
               {t("sendCode", lang)}
             </button>
-            <p className="mt-3 text-center text-[10.5px] leading-relaxed text-inkFaint">
+            <p className="mt-3 min-h-[30px] text-center text-[10.5px] leading-relaxed text-inkFaint">
               {t("demoNote", lang)}
             </p>
           </div>
@@ -238,13 +238,7 @@ export default function OtpScreen({ onDone }) {
             ))}
           </div>
 
-          {error ? (
-            <p className="mt-2 text-[12px] text-alert">{error}</p>
-          ) : (
-            <p className="mt-2 text-[11.5px] text-inkFaint">
-              {seconds > 0 ? `${t("resendIn", lang)} ${seconds}s` : t("typeAny", lang)}
-            </p>
-          )}
+          <p className="mt-2 min-h-[18px] text-[12px] text-alert">{error}</p>
 
           <div className="mt-auto pb-9">
             <Keypad onKey={press} />
@@ -254,6 +248,9 @@ export default function OtpScreen({ onDone }) {
             >
               {mode === "up" ? t("createAccount", lang) : t("verifyOpen", lang)}
             </button>
+            <p className="mt-3 min-h-[30px] text-center text-[10.5px] leading-relaxed text-inkFaint">
+              {seconds > 0 ? `${t("resendIn", lang)} ${seconds}s` : t("typeAny", lang)}
+            </p>
           </div>
         </div>
       )}

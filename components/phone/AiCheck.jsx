@@ -38,7 +38,7 @@ function resolve([classId, subjectId, chIndex, cIndex]) {
   };
 }
 
-export default function AiCheck({ onClose, onOpenConcept }) {
+export default function AiCheck({ onClose, onOpenConcept, web = false }) {
   const { lang } = useLang();
   const [phase, setPhase] = useState("capture");
 
@@ -53,9 +53,9 @@ export default function AiCheck({ onClose, onOpenConcept }) {
 
   return (
     <div className="sheet-enter absolute inset-0 z-40 flex flex-col bg-white">
-      <StatusBar />
+      {web ? null : <StatusBar />}
       <div className="flex items-center gap-3 border-b border-line px-4 pb-3 pt-1">
-        <span className="grid h-7 w-7 place-items-center rounded-full bg-brand text-[11px] font-bold text-white">
+        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand text-[11px] font-bold text-white">
           AI
         </span>
         <p className="flex-1 font-display text-[15px] font-bold text-ink">{t("checkWork", lang)}</p>
@@ -72,23 +72,50 @@ export default function AiCheck({ onClose, onOpenConcept }) {
 
       {/* ------------------------------------------------------- capture */}
       {phase === "capture" ? (
-        <div className="flex flex-1 flex-col px-5 pt-5">
-          <p className="text-[12.5px] leading-relaxed text-inkSoft">{t("aimAtNotebook", lang)}</p>
+        <div className="flex min-h-0 flex-1 flex-col px-5 pt-4">
+          <p className="text-[12.5px] leading-relaxed text-inkSoft">
+            {web ? t("chooseFile", lang) : t("aimAtNotebook", lang)}
+          </p>
 
-          <div className="relative mt-4 flex-1 overflow-hidden rounded-2xl bg-ink">
-            <Notebook />
-            <span className="absolute left-4 top-4 h-6 w-6 rounded-tl-lg border-l-2 border-t-2 border-white/70" />
-            <span className="absolute right-4 top-4 h-6 w-6 rounded-tr-lg border-r-2 border-t-2 border-white/70" />
-            <span className="absolute bottom-4 left-4 h-6 w-6 rounded-bl-lg border-b-2 border-l-2 border-white/70" />
-            <span className="absolute bottom-4 right-4 h-6 w-6 rounded-br-lg border-b-2 border-r-2 border-white/70" />
+          <div className="flex min-h-0 flex-1 items-center justify-center py-4">
+            <div
+              className={`relative aspect-[3/4] h-full max-h-[340px] overflow-hidden rounded-2xl ${
+                web ? "border-2 border-dashed border-line bg-mist" : "bg-ink"
+              }`}
+            >
+              <Notebook />
+              {web ? null : (
+                <>
+                  <span className="absolute left-3 top-3 h-5 w-5 rounded-tl-lg border-l-2 border-t-2 border-white/70" />
+                  <span className="absolute right-3 top-3 h-5 w-5 rounded-tr-lg border-r-2 border-t-2 border-white/70" />
+                  <span className="absolute bottom-3 left-3 h-5 w-5 rounded-bl-lg border-b-2 border-l-2 border-white/70" />
+                  <span className="absolute bottom-3 right-3 h-5 w-5 rounded-br-lg border-b-2 border-r-2 border-white/70" />
+                </>
+              )}
+            </div>
           </div>
 
           <div className="pb-8 pt-5">
             <button
               onClick={() => setPhase("reading")}
-              className="grad-brand w-full rounded-full py-3 font-display text-[13px] font-bold uppercase tracking-[0.1em] text-white transition hover:brightness-105 active:scale-[0.99]"
+              className={`flex w-full items-center justify-center gap-2 rounded-full py-3 font-display text-[13px] font-bold uppercase tracking-[0.1em] transition active:scale-[0.99] ${
+                web
+                  ? "border border-brand text-brand hover:bg-brandTint"
+                  : "grad-brand text-white hover:brightness-105"
+              }`}
             >
-              {t("takePhoto", lang)}
+              {web ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+                  <path
+                    d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              ) : null}
+              {web ? t("uploadPhoto", lang) : t("takePhoto", lang)}
             </button>
           </div>
         </div>

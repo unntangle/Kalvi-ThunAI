@@ -1,12 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StatusBar } from "./Chrome";
 import { t, useLang } from "./lang";
 
 const ACCENT = "#17C3D4";
 const SOFT = "#9AA6C4";
 const DIM = "rgba(255,255,255,0.22)";
+
+// Put a YouTube id here and every concept without its own video plays it. Useful for
+// demoing the player before any videos are curated. Leave empty in production.
+const DEMO_VIDEO_ID = "smRJoM6T0EQ";
+
+// Set by pasting a link in the player. Lives for the page session and applies to every
+// concept, so one paste is enough to demo the whole flow.
+let sessionVideoId = "";
 
 function Stage({ type, index, total }) {
   const on = (i) => i <= index;
@@ -144,27 +152,108 @@ function Stage({ type, index, total }) {
   );
 }
 
-export default function AvPlayer({ concept, onClose }) {
+export default function AvPlayer({ concept, classItem, subject, onClose, web = false }) {
   const { lang } = useLang();
   const steps = concept.steps;
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(true);
+  const [mode, setMode] = useState("video");
+  const [pasted, setPasted] = useState("");
+  const [linkField, setLinkField] = useState("");
+  const [auto, setAuto] = useState({ status: "idle" });
+  const requested = useRef("");
+
+  // The drawn step animation is built for worked sums, so it only applies to the
+  // maths subjects. Everywhere else the player is video only.
+  const STEP_SUBJECTS = ["maths", "busmaths"];
+  const hasSteps = subject ? STEP_SUBJECTS.includes(subject.id) : false;
+
+  // Demo affordance: paste any YouTube link to preview it in place. In a real build the
+  // id comes from the concept data instead.
+  function parseYouTube(value) {
+    const v = value.trim();
+    if (!v) return "";
+    const patterns = [
+      /youtu\.be\/([A-Za-z0-9_-]{11})/,
+      /[?&]v=([A-Za-z0-9_-]{11})/,
+      /\/embed\/([A-Za-z0-9_-]{11})/,
+      /\/shorts\/([A-Za-z0-9_-]{11})/,
+      /^([A-Za-z0-9_-]{11})$/,
+    ];
+    for (const p of patterns) {
+      const m = v.match(p);
+      if (m) return m[1];
+    }
+    return "";
+  }
+
+  const videoId =
+    concept.video || pasted || sessionVideoId || auto.videoId || DEMO_VIDEO_ID || "";
+
+  // No curated id yet? Send the student to a real YouTube search scoped to their
+  // class, subject and concept rather than to a dead embed.
+  const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(
+    [
+      "Samacheer Kalvi",
+      classItem ? `class ${classItem.id}` : "",
+      subject ? subject.name : "",
+      concept.name,
+      lang === "ta" ? "Tamil" : "",
+    ]
+      .filter(Boolean)
+      .join(" ")
+  )}`;
+
+  // If the concept has no curated id, ask the server to find an embeddable one.
+  // The query itself is the guard, so this fires once per concept and is not
+  // restarted by its own state updates.
+  useEffect(() => {
+    if (concept.video || pasted || sessionVideoId || DEMO_VIDEO_ID) return;
+
+    const query = [
+      "Samacheer Kalvi",
+      classItem ? `class ${classItem.id}` : "",
+      subject ? subject.name : "",
+      concept.name,
+      lang === "ta" ? "Tamil" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    if (requested.current === query) return;
+    requested.current = query;
+
+    setAuto({ status: "loading" });
+
+    // No cancellation flag here on purpose. React StrictMode runs effects twice in
+    // development: the first pass would set the flag in its cleanup and the response
+    // from that pass would be thrown away, leaving the player loading forever.
+    fetch(`/api/youtube?q=${encodeURIComponent(query)}`)
+      .then((r) => (r.ok ? r.json() : { configured: true, error: `HTTP ${r.status}` }))
+      .then((d) => {
+        if (!d.configured) setAuto({ status: "unconfigured" });
+        else if (d.videoId) setAuto({ status: "ready", ...d });
+        else setAuto({ status: "empty", note: d.error });
+      })
+      .catch(() => setAuto({ status: "error" }));
+  }, [concept.video, concept.name, classItem, subject, lang, pasted]);
 
   useEffect(() => {
-    if (!playing) return;
+    if (!hasSteps || mode !== "steps" || !playing) return;
     if (index >= steps.length - 1) {
       const end = setTimeout(() => setPlaying(false), 2200);
       return () => clearTimeout(end);
     }
-    const t = setTimeout(() => setIndex((i) => i + 1), 2600);
-    return () => clearTimeout(t);
-  }, [playing, index, steps.length]);
+    const timer = setTimeout(() => setIndex((i) => i + 1), 2600);
+    return () => clearTimeout(timer);
+  }, [mode, playing, index, steps.length]);
 
   const finished = !playing && index >= steps.length - 1;
+  const showVideo = !hasSteps || mode === "video";
 
   return (
     <div className="sheet-enter absolute inset-0 z-40 flex flex-col bg-night text-white">
-      <StatusBar dark />
+      {web ? null : <StatusBar dark />}
       <div className="flex items-start justify-between gap-3 px-5 pb-3 pt-2">
         <div className="min-w-0">
           <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-white/45">
@@ -183,76 +272,147 @@ export default function AvPlayer({ concept, onClose }) {
         </button>
       </div>
 
-      <div className="mx-5 rounded-2xl border border-nightLine bg-nightSoft px-3 py-3">
-        <Stage type={concept.av} index={index} total={steps.length} />
-      </div>
-
-      <div className="flex-1 overflow-y-auto px-5 pt-4">
-        <ol className="space-y-2.5">
-          {steps.map((s, i) => (
-            <li
-              key={i}
-              className={`flex gap-2.5 text-[13px] leading-relaxed transition-opacity duration-300 ${
-                i <= index ? "text-white opacity-100" : "text-white/60 opacity-40"
-              }`}
-            >
-              <span
-                className={`mt-[3px] grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full text-[10px] font-bold ${
-                  i <= index ? "bg-cyan text-ink" : "border border-white/30 text-white/60"
-                }`}
-              >
-                {i + 1}
-              </span>
-              <span>{s}</span>
-            </li>
-          ))}
-        </ol>
-
-        <div className="mt-4 flex items-center gap-2 text-[11px] text-white/45">
-          <span className="flex h-4 items-end gap-[2px]" aria-hidden>
-            {[0, 1, 2, 3].map((i) => (
-              <span
-                key={i}
-                className={`w-[3px] rounded-full bg-cyan ${playing ? "wave-bar" : ""}`}
-                style={{ height: "14px", animationDelay: `${i * 110}ms`, opacity: playing ? 1 : 0.35 }}
-              />
-            ))}
-          </span>
-          <span>{t("narration", lang)}</span>
+      {hasSteps ? (
+        <div className="mx-5 flex gap-1 rounded-full bg-white/10 p-1">
+          <button
+            onClick={() => setMode("video")}
+            aria-pressed={showVideo}
+            className={`flex-1 rounded-full py-1.5 font-display text-[12px] font-bold transition ${
+              showVideo ? "bg-white text-ink" : "text-white/65 hover:text-white"
+            }`}
+          >
+            {t("tabVideo", lang)}
+          </button>
+          <button
+            onClick={() => setMode("steps")}
+            aria-pressed={!showVideo}
+            className={`flex-1 rounded-full py-1.5 font-display text-[12px] font-bold transition ${
+              !showVideo ? "bg-white text-ink" : "text-white/65 hover:text-white"
+            }`}
+          >
+            {t("tabSteps", lang)}
+          </button>
         </div>
+      ) : null}
+
+      <div className="flex flex-1 items-center px-3">
+      {showVideo ? (
+        <div className="w-full overflow-hidden rounded-2xl border border-nightLine bg-black">
+          {videoId ? (
+            <>
+              <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
+                <iframe
+                  className="absolute inset-0 h-full w-full"
+                  src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1&autoplay=1&hl=${lang}`}
+                  title={concept.name}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  referrerPolicy="strict-origin-when-cross-origin"
+                />
+              </div>
+              {auto.status === "ready" && !concept.video && !pasted ? (
+                <p className="truncate px-3 py-2 text-[10.5px] text-white/45">{auto.channel}</p>
+              ) : null}
+            </>
+          ) : auto.status === "loading" ? (
+            <div className="flex flex-col items-center gap-3 px-5 py-10">
+              <span className="flex h-4 items-end gap-1" aria-hidden>
+                {[0, 1, 2, 3].map((i) => (
+                  <span
+                    key={i}
+                    className="wave-bar w-[3px] rounded-full bg-cyan"
+                    style={{ height: "16px", animationDelay: `${i * 90}ms` }}
+                  />
+                ))}
+              </span>
+              <p className="text-[12px] text-white/50">{t("findingVideo", lang)}</p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-3 px-5 py-7 text-center">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden className="text-white/35">
+                <rect x="3" y="5" width="18" height="14" rx="4" stroke="currentColor" strokeWidth="1.6" />
+                <path d="M10 9.5v5l4.5-2.5z" fill="currentColor" />
+              </svg>
+              <p className="text-[12px] leading-relaxed text-white/50">{t("noVideoYet", lang)}</p>
+              <a
+                href={searchUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full rounded-full bg-white py-2 text-center font-display text-[12px] font-bold text-ink transition hover:bg-white/90"
+              >
+                {t("searchYouTube", lang)}
+              </a>
+              <div className="flex w-full items-center gap-2">
+                <input
+                  value={linkField}
+                  onChange={(e) => setLinkField(e.target.value)}
+                  placeholder="Paste a YouTube link"
+                  className="min-w-0 flex-1 rounded-full border border-white/25 bg-white/5 px-3 py-2 text-[11.5px] text-white outline-none placeholder:text-white/35"
+                />
+                <button
+                  onClick={() => {
+                    const id = parseYouTube(linkField);
+                    if (!id) return;
+                    sessionVideoId = id;
+                    setPasted(id);
+                  }}
+                  className="shrink-0 rounded-full bg-white px-3 py-2 font-display text-[11.5px] font-bold text-ink transition hover:bg-white/90"
+                >
+                  {t("play", lang)}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="w-full rounded-2xl border border-nightLine bg-nightSoft px-3 py-3">
+          <Stage type={concept.av} index={index} total={steps.length} />
+        </div>
+      )}
       </div>
 
       <div className="border-t border-nightLine px-5 py-3">
-        <div className="mb-3 h-[3px] w-full rounded-full bg-white/15">
-          <div
-            className="h-full rounded-full bg-cyan"
-            style={{
-              width: `${((index + 1) / steps.length) * 100}%`,
-              transition: "width 460ms cubic-bezier(.22,.61,.36,1)",
-            }}
-          />
-        </div>
-        <div className="flex items-center gap-2">
+        {showVideo ? (
           <button
-            onClick={() => {
-              if (finished) {
-                setIndex(0);
-                setPlaying(true);
-              } else {
-                setPlaying((p) => !p);
-              }
-            }}
-            className="grad-brand flex flex-1 items-center justify-center rounded-full py-2.5 font-display text-[12.5px] font-bold uppercase tracking-[0.1em] text-white transition hover:brightness-110 active:scale-[0.99]"
+            onClick={onClose}
+            className="w-full rounded-full border border-white/25 py-2.5 font-display text-[12.5px] font-bold uppercase tracking-[0.08em] text-white/85 transition hover:bg-white/10"
           >
-            {finished ? t("playAgain", lang) : playing ? t("pause", lang) : t("play", lang)}
+            {t("closeExample", lang)}
           </button>
-          <button
-            onClick={() => setIndex((i) => Math.min(i + 1, steps.length - 1))}
-            className="rounded-full border border-white/25 px-4 py-2.5 font-display text-[12.5px] font-bold uppercase tracking-[0.08em] text-white/85 transition hover:bg-white/10"
-          >
-            {t("next", lang)}
-          </button>
-        </div>
+        ) : (
+          <>
+            <div className="mb-3 h-[3px] w-full rounded-full bg-white/15">
+              <div
+                className="h-full rounded-full bg-cyan"
+                style={{
+                  width: `${((index + 1) / steps.length) * 100}%`,
+                  transition: "width 460ms cubic-bezier(.22,.61,.36,1)",
+                }}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  if (finished) {
+                    setIndex(0);
+                    setPlaying(true);
+                  } else {
+                    setPlaying((p) => !p);
+                  }
+                }}
+                className="grad-brand flex flex-1 items-center justify-center rounded-full py-2.5 font-display text-[12.5px] font-bold uppercase tracking-[0.1em] text-white transition hover:brightness-110 active:scale-[0.99]"
+              >
+                {finished ? t("playAgain", lang) : playing ? t("pause", lang) : t("play", lang)}
+              </button>
+              <button
+                onClick={() => setIndex((i) => Math.min(i + 1, steps.length - 1))}
+                className="rounded-full border border-white/25 px-4 py-2.5 font-display text-[12.5px] font-bold uppercase tracking-[0.08em] text-white/85 transition hover:bg-white/10"
+              >
+                {t("next", lang)}
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

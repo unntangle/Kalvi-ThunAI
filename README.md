@@ -71,6 +71,49 @@ concept names and the destination screen are not mocked.
 Two deliberate choices worth keeping in a real build: the final answer is never shown, only the
 next step, and the diagnosis names the misconception rather than the mistake.
 
+## The audio-visual player
+
+**Video** plays inside the app. When the player opens it lands on the Video tab, and the video
+starts on its own.
+
+There are three ways a concept gets its video, checked in that order:
+
+1. **A curated id in the data.** Add a sixth value to the concept tuple in `data/curriculum.js` or
+   `data/senior.js` — the YouTube id, the part after `v=` in the watch URL:
+
+   ```js
+   ["Closure and commutativity", "Rational numbers stay rational…", "a/b + c/d = (ad + bc) / bd",
+    "Take 2/3 and 1/4 | Make the denominators alike | Add to get 11/12", "bar", "abcdefghijk"]
+   ```
+
+2. **An automatic lookup.** With no curated id, the player asks `/api/youtube` for one. That route
+   queries the YouTube Data API server side using the class, subject and concept name, filtered to
+   videos that actually allow embedding, with safe search on. The channel name is shown under the
+   player so the source is always visible. Results are cached in memory for six hours to stay inside
+   the API quota.
+
+3. **A pasted link**, for evaluating videos before curating them.
+
+### Setting up the lookup
+
+Copy `.env.example` to `.env.local` and add a YouTube Data API v3 key. Create one in the Google
+Cloud console under APIs and Services, enable the YouTube Data API v3, and restrict the key to that
+API. Set `YOUTUBE_CHANNEL_ID` as well to confine every lookup to a single channel.
+
+Without a key nothing breaks — the Video tab shows a search link and the paste field, and the Steps
+tab still works.
+
+### Which source to use
+
+The automatic lookup is right for a demo and for filling gaps. For anything that ships, curate the
+ids: an automatic search will occasionally return the wrong lesson or a coaching advert, and neither
+belongs on a government school concept page. Scoping the lookup to KalviTV Official, the Government
+of Tamil Nadu's own channel at `youtube.com/c/kalvitvofficial`, gets most of the way there, since it
+covers classes 1 to 12 on the same syllabus.
+
+**Steps** is the drawn animation — SVG rendered on the device, no streaming, which is why it still
+works on a weak connection. It stays available on every concept, video or not.
+
 ## Colour
 
 The palette is built for the conditions this app actually runs in: budget Android phones, low

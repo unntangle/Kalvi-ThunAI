@@ -15,9 +15,10 @@
 //   work     a full worked sum for the Steps tab
 
 export const maths = [
+  // The three concepts that carry a video, a diagram set and a worked sum lead the
+  // chapter, so the richest material is what a student meets first. The rest of
+  // the chapter follows in textbook order behind them.
   ["Relations and Functions", [
-    ["Ordered pair", "In an ordered pair the position of each element is part of the pair, not just its value.", "(a, b) = (c, d) only if a = c and b = d", "Compare (2, 5) and (5, 2) | The same two numbers appear in both | The order differs, so the pairs differ", "stack"],
-
     ["Cartesian product", "Pairing every element of one set with every element of another builds the product set.", "n(A × B) = n(A) × n(B)", "A has 3 elements, B has 4 | Every a pairs with every b | A × B holds 12 ordered pairs", "grid", "-fGJVEDLnn8", {
       figures: ["cartesian-grid", "cartesian-tree"],
       deeper: "The order inside a pair is part of the pair. (1, 2) and (2, 1) are different elements, so A × B and B × A are different sets unless A and B are the same. This is also where the rest of the chapter comes from: a relation is any subset of A × B, and a function is a subset with one extra condition on it.",
@@ -33,10 +34,6 @@ export const maths = [
         ],
       },
     }],
-
-    ["Relations", "A relation is any subset of A × B, so it is a rule that selects some of the pairs and ignores the rest.", "R ⊆ A × B", "Write out A × B in full | Keep only the pairs that obey your rule | What is left is the relation R", "grid"],
-
-    ["Domain, co-domain and range", "Three different sets describe a relation, and the range is usually smaller than the co-domain.", "range ⊆ co-domain", "Collect the first elements to get the domain | B as a whole is the co-domain | Collect the second elements actually used to get the range", "stack"],
 
     ["When a relation is a function", "Every input must have exactly one output, or the relation is not a function.", "one input, one output", "Take {(1,2), (1,3)} | The input 1 gives two outputs | So it is a relation but not a function", "grid", "_dgvDBcknnY", {
       figures: ["function-map", "vertical-line-test"],
@@ -54,12 +51,6 @@ export const maths = [
       },
     }],
 
-    ["Representing a function", "The same function can be written four ways, and an exam may hand you any one of them.", "set of pairs · table · arrow diagram · graph", "Start from the set of ordered pairs | Lay the same pairs out as a table | Draw them as arrows, then as points on a graph", "map"],
-
-    ["Types of functions", "One-one, many-one, onto and into describe how the inputs land on the outputs.", "one-one · many-one · onto · into", "Check whether two inputs share an output | If never, the function is one-one | If every element of the co-domain is used, it is onto", "cycle"],
-
-    ["Identity and constant functions", "Two special cases worth recognising on sight, because their graphs are fixed.", "f(x) = x · f(x) = k", "f(x) = x returns whatever it is given | Its graph is the line y = x | f(x) = k ignores the input and gives a horizontal line", "bar"],
-
     ["Composition of functions", "Apply the inner function first, then feed its result into the outer one.", "(f ∘ g)(x) = f(g(x))", "f(x) = 2x, g(x) = x + 3 | g(1) = 4 | f(4) = 8, so (f ∘ g)(1) = 8", "bar", "NAKQ336ycgE", {
       figures: ["function-machine", "composition-order"],
       deeper: "Composition is not commutative, so f ∘ g and g ∘ f are usually different functions and the order is part of the answer. Read f ∘ g from the right, which is what the brackets in f(g(x)) already tell you to do. For the composition to exist at all, every output of g has to be something f is allowed to accept.",
@@ -75,6 +66,18 @@ export const maths = [
         ],
       },
     }],
+
+    ["Ordered pair", "In an ordered pair the position of each element is part of the pair, not just its value.", "(a, b) = (c, d) only if a = c and b = d", "Compare (2, 5) and (5, 2) | The same two numbers appear in both | The order differs, so the pairs differ", "stack"],
+
+    ["Relations", "A relation is any subset of A × B, so it is a rule that selects some of the pairs and ignores the rest.", "R ⊆ A × B", "Write out A × B in full | Keep only the pairs that obey your rule | What is left is the relation R", "grid"],
+
+    ["Domain, co-domain and range", "Three different sets describe a relation, and the range is usually smaller than the co-domain.", "range ⊆ co-domain", "Collect the first elements to get the domain | B as a whole is the co-domain | Collect the second elements actually used to get the range", "stack"],
+
+    ["Representing a function", "The same function can be written four ways, and an exam may hand you any one of them.", "set of pairs · table · arrow diagram · graph", "Start from the set of ordered pairs | Lay the same pairs out as a table | Draw them as arrows, then as points on a graph", "map"],
+
+    ["Types of functions", "One-one, many-one, onto and into describe how the inputs land on the outputs.", "one-one · many-one · onto · into", "Check whether two inputs share an output | If never, the function is one-one | If every element of the co-domain is used, it is onto", "cycle"],
+
+    ["Identity and constant functions", "Two special cases worth recognising on sight, because their graphs are fixed.", "f(x) = x · f(x) = k", "f(x) = x returns whatever it is given | Its graph is the line y = x | f(x) = k ignores the input and gives a horizontal line", "bar"],
 
     ["Identifying graphs", "The highest power in the rule decides the shape of the curve before you plot a single point.", "linear · quadratic · cubic · reciprocal", "Look at the highest power of x | Power 1 gives a straight line | Power 2 gives a parabola, power 3 an S-shaped curve", "map"],
   ]],
@@ -97,14 +100,6 @@ export const maths = [
       },
     }],
 
-    ["Euclid's division algorithm", "Repeating the lemma until the remainder is zero finds the HCF of any two numbers.", "last non-zero remainder = HCF", "Apply the lemma to the two numbers | Feed divisor and remainder back in | Stop at remainder 0 and read the previous remainder", "stack"],
-
-    ["Fundamental theorem of arithmetic", "Every whole number above 1 breaks into primes in exactly one way, apart from the order.", "unique prime factorisation", "Factorise 60 as 2 × 2 × 3 × 5 | Try any other route and the same primes appear | Only the order can change", "grid"],
-
-    ["Modular arithmetic", "Two numbers are congruent when they leave the same remainder on division by the modulus.", "a ≡ b (mod n)", "Divide 17 by 5 to get remainder 2 | Divide 32 by 5 to get remainder 2 | So 17 ≡ 32 (mod 5)", "cycle"],
-
-    ["Sequences", "A sequence is a list in a fixed order, and its general term is a rule for the nth item.", "aₙ is the rule for term n", "Look at 2, 4, 6, 8 | Each term is twice its position | So aₙ = 2n", "bar"],
-
     ["Arithmetic progression", "Each term rises by the same fixed amount, so the nth term is a straight line rule.", "aₙ = a + (n − 1)d", "a = 5, d = 3 | For the 10th term, n − 1 = 9 | 5 + 9 × 3 = 32", "bar", "DqgorwhXFAE", {
       figures: ["ap-ladder", "ap-vs-gp"],
       deeper: "Because d never changes, plotting the terms against their position gives points sitting on a straight line of slope d. That is why the nth term formula reads like the equation of a line. To test any sequence, subtract each term from the one after it; if every difference is the same number, it is an AP and that number is d.",
@@ -122,8 +117,6 @@ export const maths = [
       },
     }],
 
-    ["Sum of an arithmetic series", "Pairing the first term with the last is what collapses the whole sum into one line.", "Sₙ = n/2 (a + l) = n/2 [2a + (n − 1)d]", "First 10 terms of 5, 8, 11 … last is 32 | n/2 = 5 | 5 × (5 + 32) = 185", "grid"],
-
     ["Geometric progression", "Each term is the previous one multiplied by a fixed ratio, so growth is multiplicative.", "aₙ = a rⁿ⁻¹", "a = 3, r = 2 | For the 5th term, r⁴ = 16 | 3 × 16 = 48", "bar", "mleAusXs2JY", {
       figures: ["gp-doubling", "ap-vs-gp"],
       deeper: "Where an AP adds the same amount each time, a GP multiplies by it, so once r is above 1 the terms climb far faster than any AP. If r sits between 0 and 1 the terms shrink towards zero instead. The test is division rather than subtraction: divide each term by the one before it, and a constant answer means a GP with that answer as r.",
@@ -140,6 +133,16 @@ export const maths = [
         ],
       },
     }],
+
+    ["Euclid's division algorithm", "Repeating the lemma until the remainder is zero finds the HCF of any two numbers.", "last non-zero remainder = HCF", "Apply the lemma to the two numbers | Feed divisor and remainder back in | Stop at remainder 0 and read the previous remainder", "stack"],
+
+    ["Fundamental theorem of arithmetic", "Every whole number above 1 breaks into primes in exactly one way, apart from the order.", "unique prime factorisation", "Factorise 60 as 2 × 2 × 3 × 5 | Try any other route and the same primes appear | Only the order can change", "grid"],
+
+    ["Modular arithmetic", "Two numbers are congruent when they leave the same remainder on division by the modulus.", "a ≡ b (mod n)", "Divide 17 by 5 to get remainder 2 | Divide 32 by 5 to get remainder 2 | So 17 ≡ 32 (mod 5)", "cycle"],
+
+    ["Sequences", "A sequence is a list in a fixed order, and its general term is a rule for the nth item.", "aₙ is the rule for term n", "Look at 2, 4, 6, 8 | Each term is twice its position | So aₙ = 2n", "bar"],
+
+    ["Sum of an arithmetic series", "Pairing the first term with the last is what collapses the whole sum into one line.", "Sₙ = n/2 (a + l) = n/2 [2a + (n − 1)d]", "First 10 terms of 5, 8, 11 … last is 32 | n/2 = 5 | 5 × (5 + 32) = 185", "grid"],
 
     ["Sum of a geometric series", "Which form of the formula you use depends only on whether r is above or below 1.", "Sₙ = a(rⁿ − 1)/(r − 1), r ≠ 1", "a = 3, r = 2, n = 5 | rⁿ = 32, so rⁿ − 1 = 31 | 3 × 31 ÷ 1 = 93", "grid"],
 

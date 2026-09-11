@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppBar, Screen, StatusBar } from "./Chrome";
 import AskSheet from "./AskSheet";
+import Figure from "./Figure";
 import { className, subjectName, t, useLang } from "./lang";
 
 export default function ConceptDetail({
@@ -19,6 +20,14 @@ export default function ConceptDetail({
 }) {
   const { lang } = useLang();
   const [asking, setAsking] = useState(false);
+  const pane = useRef(null);
+
+  // Next and Back swap the concept without remounting this screen, so the pane
+  // keeps whatever scroll position it had. Send it back to the top on every
+  // change, or the student lands halfway down the new concept.
+  useEffect(() => {
+    pane.current?.scrollTo({ top: 0 });
+  }, [concept.id]);
 
   return (
     <Screen dir={dir}>
@@ -29,12 +38,13 @@ export default function ConceptDetail({
         crumb={`${className(classItem, lang)} · ${subjectName(subject, lang)}`}
       />
 
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      <div ref={pane} className="flex-1 overflow-y-auto px-4 py-4">
         <section>
           <h2 className="font-display text-[12px] font-bold text-inkFaint">
             {t("whatItMeans", lang)}
           </h2>
           <p className="mt-1.5 text-[14px] leading-relaxed text-ink">{concept.summary}</p>
+          <Figure name={concept.figures?.[0]} />
         </section>
 
         <section className="relative mt-6 rounded-lg border border-ink/20 px-4 pb-4 pt-5">
@@ -61,6 +71,39 @@ export default function ConceptDetail({
             ))}
           </ol>
         </section>
+
+        {/* Everything below is optional. A concept without the longer theory just
+            ends at the worked example, the way it always did. */}
+
+        {concept.deeper ? (
+          <section className="mt-6">
+            <h2 className="font-display text-[12px] font-bold text-inkFaint">
+              {t("goingDeeper", lang)}
+            </h2>
+            <p className="mt-1.5 text-[13.5px] leading-relaxed text-inkSoft">{concept.deeper}</p>
+          </section>
+        ) : null}
+
+        {concept.mistake ? (
+          <section className="mt-6 border-t border-line pt-4">
+            <h2 className="font-display text-[12px] font-bold text-alert">
+              {t("commonMistake", lang)}
+            </h2>
+            <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink">{concept.mistake}</p>
+          </section>
+        ) : null}
+
+        {concept.tryIt ? (
+          <section className="mt-6 border-t border-line pt-4">
+            <h2 className="font-display text-[12px] font-bold text-brand">{t("tryIt", lang)}</h2>
+            <p className="mt-1.5 font-display text-[14px] font-bold leading-relaxed text-ink">
+              {concept.tryIt}
+            </p>
+            <p className="mt-1.5 text-[11px] leading-relaxed text-inkFaint">
+              {t("noAnswerGiven", lang)}
+            </p>
+          </section>
+        ) : null}
 
         <button
           onClick={onPlay}

@@ -16,42 +16,37 @@ const STR = {
   signIn: { en: "Sign in", ta: "உள்நுழை" },
   signUp: { en: "Sign up", ta: "பதிவு செய்" },
   demoNote: {
-    en: "A demo sign-in. Nothing is sent and no number is stored.",
-    ta: "இது ஒரு மாதிரி உள்நுழைவு. எந்த எண்ணும் சேமிக்கப்படவில்லை.",
+    en: "A demo sign-in. Nothing is sent and no detail is stored.",
+    ta: "இது ஒரு மாதிரி உள்நுழைவு. எந்த விவரமும் சேமிக்கப்படவில்லை.",
   },
 
-  // mobile number
-  titleIn: { en: "Sign in with your mobile number", ta: "கைபேசி எண்ணால் உள்நுழையுங்கள்" },
+  // student details
+  titleIn: { en: "Sign in with your details", ta: "உங்கள் விவரங்களால் உள்நுழையுங்கள்" },
   titleUp: { en: "Create your account", ta: "புதிய கணக்கை உருவாக்குங்கள்" },
   subIn: {
-    en: "We send a four digit code. There is no password to remember.",
-    ta: "நான்கு இலக்கக் குறியீடு அனுப்பப்படும். கடவுச்சொல் தேவையில்லை.",
+    en: "Your name, class and roll number. There is no password to remember.",
+    ta: "பெயர், வகுப்பு, வரிசை எண் மட்டும். கடவுச்சொல் தேவையில்லை.",
   },
   subUp: {
-    en: "Your mobile number is the account. We send a four digit code to confirm it.",
-    ta: "உங்கள் கைபேசி எண்ணே கணக்கு. அதை உறுதிப்படுத்த ஒரு குறியீடு அனுப்பப்படும்.",
+    en: "Your name, class and roll number set up the account. Nothing else is needed.",
+    ta: "பெயர், வகுப்பு, வரிசை எண் மூலம் கணக்கு உருவாகும். வேறு எதுவும் தேவையில்லை.",
   },
-  sendCode: { en: "Send code", ta: "குறியீடு அனுப்பு" },
-  errNumber: {
-    en: "Enter all ten digits of your mobile number.",
-    ta: "பத்து இலக்கங்களையும் உள்ளிடுங்கள்.",
-  },
-
-  // code
-  enterCode: { en: "Enter the code", ta: "குறியீட்டை உள்ளிடுங்கள்" },
-  sentTo: { en: "Sent to", ta: "அனுப்பப்பட்டது" },
-  changeNumber: { en: "Change number", ta: "எண்ணை மாற்று" },
-  resendIn: { en: "Resend in", ta: "மீண்டும் அனுப்ப" },
-  typeAny: {
-    en: "Type any four digits to continue.",
-    ta: "தொடர ஏதேனும் நான்கு இலக்கங்களை உள்ளிடுங்கள்.",
-  },
-  verifyOpen: { en: "Verify and open", ta: "சரிபார்த்துத் திற" },
+  labelName: { en: "Name", ta: "பெயர்" },
+  labelClass: { en: "Class", ta: "வகுப்பு" },
+  labelRoll: { en: "Roll number", ta: "வரிசை எண்" },
+  phName: { en: "Your full name", ta: "உங்கள் முழுப் பெயர்" },
+  phRoll: { en: "e.g. 23", ta: "எ.கா. 23" },
+  classHint: { en: "Choose your class", ta: "வகுப்பைத் தேர்ந்தெடுங்கள்" },
+  continueWord: { en: "Continue", ta: "தொடரவும்" },
   createAccount: { en: "Create account", ta: "கணக்கை உருவாக்கு" },
-  errCode: { en: "The code is four digits long.", ta: "குறியீடு நான்கு இலக்கங்கள்." },
+  errName: { en: "Enter your name.", ta: "உங்கள் பெயரை உள்ளிடுங்கள்." },
+  errClass: { en: "Choose your class.", ta: "உங்கள் வகுப்பைத் தேர்ந்தெடுங்கள்." },
+  errRoll: { en: "Enter your roll number.", ta: "வரிசை எண்ணை உள்ளிடுங்கள்." },
 
   // class
   signedInAs: { en: "Signed in as", ta: "உள்நுழைந்தவர்" },
+  rollWord: { en: "Roll", ta: "வரிசை" },
+  changeClass: { en: "Change your class", ta: "வகுப்பை மாற்றுங்கள்" },
   whichClass: { en: "Which class are you in?", ta: "நீங்கள் எந்த வகுப்பு?" },
   signOut: { en: "Sign out", ta: "வெளியேறு" },
   groupsBadge: { en: "Groups", ta: "குழுக்கள்" },
@@ -82,11 +77,20 @@ const STR = {
 
   // concept page
   whatItMeans: { en: "What it means", ta: "இதன் பொருள்" },
+  goingDeeper: { en: "Going deeper", ta: "கூடுதல் அறிய" },
+  commonMistake: { en: "Where students slip", ta: "மாணவர்கள் தவறும் இடம்" },
+  tryIt: { en: "Try it yourself", ta: "நீங்களே செய்துப் பாருங்கள்" },
+  noAnswerGiven: {
+    en: "Work it out before you open the next concept. The answer is not on this page.",
+    ta: "அடுத்த கருத்துக்குச் செல்லும் முன் செய்து பாருங்கள். விடை இங்கு தரப்படவில்லை.",
+  },
   rememberThis: { en: "Remember this", ta: "இதை நினைவில் கொள்ளுங்கள்" },
   workedExample: { en: "Worked example", ta: "செய்முறை எடுத்துக்காட்டு" },
   watchExample: { en: "Watch video", ta: "விடியோவைப் பார்" },
   audioVisual: { en: "Audio visual", ta: "ஒளி ஒலி" },
   steps: { en: "steps", ta: "படிகள்" },
+  stepWord: { en: "Step", ta: "படி" },
+  theSum: { en: "The sum", ta: "கணக்கு" },
   nextConcept: { en: "Next concept", ta: "அடுத்த கருத்து" },
   prevConcept: { en: "Previous concept", ta: "முந்தைய கருத்து" },
   backWord: { en: "Back", ta: "பின்" },
@@ -106,6 +110,7 @@ const STR = {
   next: { en: "Next", ta: "அடுத்து" },
   closeExample: { en: "Close the example", ta: "எடுத்துக்காட்டை மூடு" },
   tabVideo: { en: "Video", ta: "விடியோ" },
+  tabPhotos: { en: "Photos", ta: "படங்கள்" },
   tabSteps: { en: "Steps", ta: "படிகள்" },
   noVideoYet: {
     en: "No video linked to this concept yet.",
@@ -154,6 +159,15 @@ const STR = {
   askGuard: {
     en: "Answers give the next step, never the final answer.",
     ta: "பதில் அடுத்த படியை மட்டுமே காட்டும், விடையை அல்ல.",
+  },
+
+  // voice input
+  micStart: { en: "Speak your doubt", ta: "உங்கள் சந்தேகத்தைச் சொல்லுங்கள்" },
+  micStop: { en: "Stop recording", ta: "பதிவை நிறுத்து" },
+  micListening: { en: "Listening…", ta: "கேட்கிறது…" },
+  micHint: {
+    en: "Speak clearly, then tap send. Tap the mic again to stop.",
+    ta: "தெளிவாகப் பேசுங்கள். நிறுத்த மீண்டும் தட்டுங்கள்.",
   },
 };
 

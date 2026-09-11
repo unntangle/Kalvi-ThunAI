@@ -2,11 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { StatusBar } from "./Chrome";
+import Figure, { figureCaption } from "./Figure";
 import { t, useLang } from "./lang";
-
-const ACCENT = "#17C3D4";
-const SOFT = "#9AA6C4";
-const DIM = "rgba(255,255,255,0.22)";
 
 // Put a YouTube id here and every concept without its own video plays it. Useful for
 // demoing the player before any videos are curated. Leave empty in production.
@@ -16,157 +13,27 @@ const DEMO_VIDEO_ID = "smRJoM6T0EQ";
 // concept, so one paste is enough to demo the whole flow.
 let sessionVideoId = "";
 
-function Stage({ type, index, total }) {
-  const on = (i) => i <= index;
-
-  if (type === "grid") {
-    return (
-      <svg viewBox="0 0 240 110" className="w-full" role="img" aria-label="Step visual">
-        {Array.from({ length: 15 }).map((_, i) => {
-          const col = i % 5;
-          const row = Math.floor(i / 5);
-          const lit = col <= index + 1;
-          return (
-            <rect
-              key={i}
-              x={22 + col * 40}
-              y={12 + row * 30}
-              width="34"
-              height="24"
-              rx="5"
-              fill={lit ? ACCENT : "transparent"}
-              fillOpacity={lit ? 0.2 + row * 0.1 : 0}
-              stroke={lit ? ACCENT : DIM}
-              strokeWidth="1.3"
-            />
-          );
-        })}
-      </svg>
-    );
-  }
-
-  if (type === "cycle") {
-    const pts = [
-      [58, 34],
-      [182, 34],
-      [120, 92],
-    ];
-    return (
-      <svg viewBox="0 0 240 110" className="w-full" role="img" aria-label="Step visual">
-        <path d="M58 34 L182 34 L120 92 Z" fill="none" stroke={DIM} strokeWidth="1.4" strokeDasharray="5 6" />
-        {pts.map(([x, y], i) => (
-          <g key={i}>
-            <circle
-              cx={x}
-              cy={y}
-              r={on(i) ? 17 : 13}
-              fill={on(i) ? ACCENT : "transparent"}
-              fillOpacity={on(i) ? 0.25 : 0}
-              stroke={on(i) ? ACCENT : DIM}
-              strokeWidth="1.6"
-            />
-            <text x={x} y={y + 4} textAnchor="middle" fontSize="12" fontWeight="700" fill={on(i) ? "#fff" : DIM}>
-              {i + 1}
-            </text>
-          </g>
-        ))}
-      </svg>
-    );
-  }
-
-  if (type === "stack") {
-    return (
-      <svg viewBox="0 0 240 110" className="w-full" role="img" aria-label="Step visual">
-        {Array.from({ length: total }).map((_, i) => (
-          <rect
-            key={i}
-            x={30}
-            y={16 + i * 30}
-            width={on(i) ? 180 : 60}
-            height="22"
-            rx="6"
-            fill={on(i) ? ACCENT : "transparent"}
-            fillOpacity={on(i) ? 0.26 : 0}
-            stroke={on(i) ? ACCENT : DIM}
-            strokeWidth="1.4"
-            style={{ transition: "width 420ms cubic-bezier(.22,.61,.36,1)" }}
-          />
-        ))}
-      </svg>
-    );
-  }
-
-  if (type === "map") {
-    return (
-      <svg viewBox="0 0 240 110" className="w-full" role="img" aria-label="Step visual">
-        <path
-          d="M40 86 C52 52 72 26 108 22 C146 18 178 38 196 62 C206 75 200 90 182 92 L58 94 C44 94 36 92 40 86 Z"
-          fill="#fff"
-          fillOpacity="0.06"
-          stroke={DIM}
-          strokeWidth="1.4"
-        />
-        {[
-          [86, 58],
-          [130, 44],
-          [168, 70],
-        ].map(([x, y], i) => (
-          <g key={i} opacity={on(i) ? 1 : 0.3} style={{ transition: "opacity 380ms" }}>
-            <circle cx={x} cy={y} r="5" fill={on(i) ? ACCENT : DIM} />
-            <circle cx={x} cy={y} r="12" fill="none" stroke={on(i) ? ACCENT : DIM} strokeWidth="1.2" />
-          </g>
-        ))}
-      </svg>
-    );
-  }
-
-  const pct = ((index + 1) / total) * 100;
-  return (
-    <svg viewBox="0 0 240 110" className="w-full" role="img" aria-label="Step visual">
-      <line x1="24" y1="62" x2="216" y2="62" stroke={DIM} strokeWidth="1.6" />
-      {Array.from({ length: total + 1 }).map((_, i) => {
-        const x = 24 + (192 / total) * i;
-        return <line key={i} x1={x} y1="54" x2={x} y2="70" stroke={DIM} strokeWidth="1.4" />;
-      })}
-      <rect
-        x="24"
-        y="55"
-        width={(192 * pct) / 100}
-        height="14"
-        rx="7"
-        fill={ACCENT}
-        fillOpacity="0.38"
-        style={{ transition: "width 460ms cubic-bezier(.22,.61,.36,1)" }}
-      />
-      <circle
-        cx={24 + (192 * pct) / 100}
-        cy="62"
-        r="7"
-        fill={ACCENT}
-        style={{ transition: "cx 460ms cubic-bezier(.22,.61,.36,1)" }}
-      />
-      <text x="24" y="40" fontSize="11" fill={SOFT}>
-        step {index + 1} of {total}
-      </text>
-    </svg>
-  );
-}
-
 export default function AvPlayer({ concept, classItem, subject, onClose, web = false }) {
   const { lang } = useLang();
   const steps = concept.steps;
+
+  // A concept with a full worked sum drives the Steps tab from that instead of the
+  // three-line summary. The sum is what a student would actually write down.
+  const work = concept.work?.lines?.length ? concept.work : null;
+  const total = work ? work.lines.length : steps.length;
+
   const [index, setIndex] = useState(0);
-  const [playing, setPlaying] = useState(true);
   const [mode, setMode] = useState("video");
   const [pasted, setPasted] = useState("");
   const [linkField, setLinkField] = useState("");
   const [auto, setAuto] = useState({ status: "idle" });
   const requested = useRef("");
 
-  // The drawn step animation is built for worked sums, so it only applies to the
-  // maths subjects. Everywhere else the player is video only.
+  // The generic step animation was built for worked sums, so it stays on the maths
+  // subjects. Any concept that carries a full worked sum of its own gets the tab
+  // too, which is how the physics numericals show up here.
   const STEP_SUBJECTS = ["maths", "busmaths"];
-  const hasSteps = subject ? STEP_SUBJECTS.includes(subject.id) : false;
+  const hasSteps = Boolean(work) || (subject ? STEP_SUBJECTS.includes(subject.id) : false);
 
   // Demo affordance: paste any YouTube link to preview it in place. In a real build the
   // id comes from the concept data instead.
@@ -238,18 +105,63 @@ export default function AvPlayer({ concept, classItem, subject, onClose, web = f
       .catch(() => setAuto({ status: "error" }));
   }, [concept.video, concept.name, classItem, subject, lang, pasted]);
 
-  useEffect(() => {
-    if (!hasSteps || mode !== "steps" || !playing) return;
-    if (index >= steps.length - 1) {
-      const end = setTimeout(() => setPlaying(false), 2200);
-      return () => clearTimeout(end);
-    }
-    const timer = setTimeout(() => setIndex((i) => i + 1), 2600);
-    return () => clearTimeout(timer);
-  }, [mode, playing, index, steps.length]);
+  // One shape for both cases: a worked sum gives [line, note] rows, and a concept
+  // without one falls back to its three step sentences with no note.
+  const timeline = work ? work.lines : steps.map((s) => [s, null]);
 
-  const finished = !playing && index >= steps.length - 1;
+  // Timing for the reveal, staged so each step reads as three separate beats:
+  // the node appears, its text follows, then the rail travels to the next node.
+  const badgeMs = 340; // the numbered node popping in
+  const textMs = 500; // its line and reason fading up
+  const lineMs = 800; // the rail travelling to the next node
+  const holdMs = work ? 1400 : 1150; // reading time before the rail sets off again
+
+  // The list mounts with everything hidden and only flips on the next frame.
+  // Without this, item 1 renders in its final state on the very first paint, so
+  // the browser has nothing to transition from and it simply appears.
+  const [started, setStarted] = useState(false);
+  useEffect(() => {
+    if (mode !== "steps") {
+      setStarted(false);
+      return;
+    }
+    const id = setTimeout(() => setStarted(true), 40);
+    return () => clearTimeout(id);
+  }, [mode]);
+
+  // The reveal runs on its own. There is no play control: the student opens the
+  // tab and the working writes itself out, the way a teacher fills a board.
+  useEffect(() => {
+    if (!hasSteps || mode !== "steps" || !started) return;
+    if (index >= total - 1) return;
+    // The first node has no rail to wait for, so it skips that beat.
+    const delay = (index === 0 ? 0 : lineMs) + badgeMs + textMs + holdMs;
+    const timer = setTimeout(() => setIndex((i) => i + 1), delay);
+    return () => clearTimeout(timer);
+  }, [mode, started, index, total, badgeMs, textMs, lineMs, holdMs, hasSteps]);
+
+  // Start again from the top whenever the tab is opened. This is done in the tab
+  // handler rather than an effect on purpose: an effect resets one render too
+  // late, so the rail renders once at its old height and then animates backwards
+  // down to zero before starting again.
+
   const showVideo = !hasSteps || mode === "video";
+
+  // Photos = the drawn diagrams for this concept, plus any curated photographs.
+  // Every subject can have these, not just the maths ones.
+  const gallery = [
+    ...(concept.figures ?? []).map((n) => ({ kind: "figure", name: n })),
+    ...(concept.images ?? []).map((im) => ({ kind: "image", ...im })),
+  ];
+  const hasPhotos = gallery.length > 0;
+
+  const TABS = [
+    { id: "video", label: t("tabVideo", lang), show: true },
+    { id: "photos", label: t("tabPhotos", lang), show: hasPhotos },
+    { id: "steps", label: t("tabSteps", lang), show: hasSteps },
+  ].filter((tab) => tab.show);
+
+  const active = mode === "steps" && !hasSteps ? "video" : mode;
 
   return (
     <div className="sheet-enter absolute inset-0 z-40 flex flex-col bg-night text-white">
@@ -272,31 +184,55 @@ export default function AvPlayer({ concept, classItem, subject, onClose, web = f
         </button>
       </div>
 
-      {hasSteps ? (
+      {TABS.length > 1 ? (
         <div className="mx-5 flex gap-1 rounded-full bg-white/10 p-1">
-          <button
-            onClick={() => setMode("video")}
-            aria-pressed={showVideo}
-            className={`flex-1 rounded-full py-1.5 font-display text-[12px] font-bold transition ${
-              showVideo ? "bg-white text-ink" : "text-white/65 hover:text-white"
-            }`}
-          >
-            {t("tabVideo", lang)}
-          </button>
-          <button
-            onClick={() => setMode("steps")}
-            aria-pressed={!showVideo}
-            className={`flex-1 rounded-full py-1.5 font-display text-[12px] font-bold transition ${
-              !showVideo ? "bg-white text-ink" : "text-white/65 hover:text-white"
-            }`}
-          >
-            {t("tabSteps", lang)}
-          </button>
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setMode(tab.id);
+                setIndex(0);
+              }}
+              aria-pressed={active === tab.id}
+              className={`flex-1 rounded-full py-1.5 font-display text-[12px] font-bold transition ${
+                active === tab.id ? "bg-white text-ink" : "text-white/65 hover:text-white"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
       ) : null}
 
-      <div className="flex flex-1 items-center px-3">
-      {showVideo ? (
+      <div className="flex flex-1 items-start px-3 pt-1">
+      {active === "photos" ? (
+        /* Every diagram for this concept, scrollable, each with its caption.
+           Drawn on the device, so the gallery costs no bandwidth. */
+        <div className="h-full w-full overflow-y-auto py-1">
+          <div className="space-y-3">
+            {gallery.map((item, i) =>
+              item.kind === "figure" ? (
+                <figure key={`f${i}`} className="rounded-2xl border border-nightLine bg-nightSoft p-3">
+                  <Figure name={item.name} tone="dark" bare />
+                  <figcaption className="mt-2 border-t border-nightLine pt-2 text-[11.5px] leading-relaxed text-white/55">
+                    {figureCaption(item.name, lang)}
+                  </figcaption>
+                </figure>
+              ) : (
+                <figure key={`i${i}`} className="overflow-hidden rounded-2xl border border-nightLine bg-nightSoft">
+                  {/* Curated photographs. Plain img on purpose: these are remote
+                      URLs, not files in the project. */}
+                  <img src={item.src} alt={item.caption ?? concept.name} className="w-full" />
+                  <figcaption className="px-3 py-2 text-[11.5px] leading-relaxed text-white/55">
+                    {item.caption}
+                    {item.credit ? <span className="text-white/30"> · {item.credit}</span> : null}
+                  </figcaption>
+                </figure>
+              )
+            )}
+          </div>
+        </div>
+      ) : showVideo ? (
         <div className="w-full overflow-hidden rounded-2xl border border-nightLine bg-black">
           {videoId ? (
             <>
@@ -365,55 +301,99 @@ export default function AvPlayer({ concept, classItem, subject, onClose, web = f
           )}
         </div>
       ) : (
-        <div className="w-full rounded-2xl border border-nightLine bg-nightSoft px-3 py-3">
-          <Stage type={concept.av} index={index} total={steps.length} />
+        <div className="h-full w-full overflow-y-auto py-1">
+          <div className="rounded-2xl border border-nightLine bg-nightSoft p-4">
+            {work ? (
+              <>
+                <p className="font-display text-[10.5px] font-bold uppercase tracking-[0.14em] text-white/40">
+                  {t("theSum", lang)}
+                </p>
+                <p className="mt-1 font-display text-[13.5px] font-semibold leading-snug text-white">
+                  {work.question}
+                </p>
+              </>
+            ) : (
+              <p className="font-display text-[10.5px] font-bold uppercase tracking-[0.14em] text-white/40">
+                {t("workedExample", lang)}
+              </p>
+            )}
+
+            {/* Each step is staged: node, then text, then the rail down to the next
+                node. The rail is drawn per gap so a segment runs exactly from one
+                node to the next and can be scaled from its top edge. */}
+            <ol className="relative mt-4 border-t border-nightLine pt-4">
+              {timeline.map(([line, note], i) => {
+                const shown = started && i <= index;
+                const last = i === timeline.length - 1;
+
+                // The first node arrives straight away. Every later one waits for
+                // the rail to reach it, and its text waits for the node.
+                const nodeAt = i === 0 ? 0 : lineMs;
+                const textAt = nodeAt + badgeMs;
+
+                return (
+                  <li key={i} className={`relative pl-8 ${last ? "pb-0" : "pb-5"}`}>
+                    {!last ? (
+                      <>
+                        <span
+                          aria-hidden
+                          className="absolute bottom-0 left-[10px] top-[22px] w-[2px] rounded-full bg-nightLine"
+                          style={{
+                            opacity: shown ? 1 : 0,
+                            transition: `opacity 300ms ease ${nodeAt}ms`,
+                          }}
+                        />
+                        <span
+                          aria-hidden
+                          className="absolute bottom-0 left-[10px] top-[22px] w-[2px] origin-top rounded-full bg-cyan"
+                          style={{
+                            transform: `scaleY(${i < index ? 1 : 0})`,
+                            transition: `transform ${lineMs}ms linear`,
+                          }}
+                        />
+                      </>
+                    ) : null}
+
+                    {/* ring-nightSoft matches the card behind, so the ring punches a
+                       clean gap in the rail rather than letting it run through the
+                       node. */}
+                    <span
+                      className="absolute left-0 top-0 z-10 grid h-[22px] w-[22px] place-items-center rounded-full bg-cyan font-display text-[10px] font-bold text-night ring-4 ring-nightSoft"
+                      style={{
+                        opacity: shown ? 1 : 0,
+                        transform: shown ? "scale(1)" : "scale(0.5)",
+                        transition: `opacity ${badgeMs}ms ease ${nodeAt}ms, transform ${badgeMs}ms cubic-bezier(.34,1.56,.64,1) ${nodeAt}ms`,
+                      }}
+                    >
+                      {i + 1}
+                    </span>
+
+                    <div
+                      style={{
+                        opacity: shown ? 1 : 0,
+                        transform: shown ? "translateY(0)" : "translateY(6px)",
+                        transition: `opacity ${textMs}ms ease ${textAt}ms, transform ${textMs}ms ease ${textAt}ms`,
+                      }}
+                    >
+                      <p className="font-display text-[14px] font-semibold leading-snug text-white">
+                        {line}
+                      </p>
+                      {note ? (
+                        <p className="mt-1 text-[11.5px] leading-relaxed text-cyan/85">{note}</p>
+                      ) : null}
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
         </div>
       )}
       </div>
 
-      <div className="border-t border-nightLine px-5 py-3">
-        {showVideo ? (
-          <button
-            onClick={onClose}
-            className="w-full rounded-full border border-white/25 py-2.5 font-display text-[12.5px] font-bold uppercase tracking-[0.08em] text-white/85 transition hover:bg-white/10"
-          >
-            {t("closeExample", lang)}
-          </button>
-        ) : (
-          <>
-            <div className="mb-3 h-[3px] w-full rounded-full bg-white/15">
-              <div
-                className="h-full rounded-full bg-cyan"
-                style={{
-                  width: `${((index + 1) / steps.length) * 100}%`,
-                  transition: "width 460ms cubic-bezier(.22,.61,.36,1)",
-                }}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  if (finished) {
-                    setIndex(0);
-                    setPlaying(true);
-                  } else {
-                    setPlaying((p) => !p);
-                  }
-                }}
-                className="grad-brand flex flex-1 items-center justify-center rounded-full py-2.5 font-display text-[12.5px] font-bold uppercase tracking-[0.1em] text-white transition hover:brightness-110 active:scale-[0.99]"
-              >
-                {finished ? t("playAgain", lang) : playing ? t("pause", lang) : t("play", lang)}
-              </button>
-              <button
-                onClick={() => setIndex((i) => Math.min(i + 1, steps.length - 1))}
-                className="rounded-full border border-white/25 px-4 py-2.5 font-display text-[12.5px] font-bold uppercase tracking-[0.08em] text-white/85 transition hover:bg-white/10"
-              >
-                {t("next", lang)}
-              </button>
-            </div>
-          </>
-        )}
-      </div>
+      {/* No footer on any tab. The Steps reveal runs itself, and the X in the
+          header is how the player closes. */}
+      <div className="pb-3" aria-hidden />
     </div>
   );
 }

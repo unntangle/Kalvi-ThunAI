@@ -4,7 +4,7 @@ import { CLASSES, classTotals, hasGroups } from "@/data/curriculum";
 import { LangToggle, Screen, StatusBar } from "./Chrome";
 import { className, t, useLang } from "./lang";
 
-export default function ClassScreen({ dir, phone, onPick, onSignOut }) {
+export default function ClassScreen({ dir, student, current, onPick, onSignOut }) {
   const { lang } = useLang();
 
   return (
@@ -13,11 +13,12 @@ export default function ClassScreen({ dir, phone, onPick, onSignOut }) {
         <StatusBar dark />
         <div className="flex items-start justify-between gap-3 px-5 pb-6 pt-2">
           <div className="min-w-0">
-            <p className="text-[12px] text-white/65">
-              {t("signedInAs", lang)} +91 {phone || "••••• •••••"}
+            <p className="truncate text-[12px] text-white/65">
+              {t("signedInAs", lang)} {student?.name || "—"}
+              {student?.roll ? ` · ${t("rollWord", lang)} ${student.roll}` : ""}
             </p>
             <h1 className="mt-1 font-display text-[21px] font-extrabold leading-tight">
-              {t("whichClass", lang)}
+              {current ? t("changeClass", lang) : t("whichClass", lang)}
             </h1>
           </div>
           <div className="flex shrink-0 flex-col items-end gap-2">
@@ -36,11 +37,15 @@ export default function ClassScreen({ dir, phone, onPick, onSignOut }) {
         <div className="grid grid-cols-2 gap-3">
           {CLASSES.map((c) => {
             const totals = classTotals(c.id);
+            const on = c.id === current;
             return (
               <button
                 key={c.id}
                 onClick={() => onPick(c)}
-                className="rounded-2xl border border-line bg-white p-4 text-left shadow-raised transition hover:-translate-y-0.5 hover:border-brand/50 active:scale-[0.98]"
+                aria-current={on ? "true" : undefined}
+                className={`rounded-2xl border bg-white p-4 text-left shadow-raised transition hover:-translate-y-0.5 hover:border-brand/50 active:scale-[0.98] ${
+                  on ? "border-brand ring-1 ring-brand/30" : "border-line"
+                }`}
               >
                 <span className="flex items-baseline gap-2">
                   <span className="font-display text-[30px] font-extrabold leading-none text-brand">

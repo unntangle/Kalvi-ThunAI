@@ -3,13 +3,13 @@
 const STEPS = [
   {
     stages: ["auth"],
-    label: "Sign in with a number",
-    body: "A mobile number and a four digit code. Nothing else to remember, which matters when the phone belongs to a parent.",
+    label: "Sign in with name, class and roll number",
+    body: "The three things every student already knows by heart. No password, no code to wait for, which matters when the phone belongs to a parent.",
   },
   {
     stages: ["class", "group"],
-    label: "Pick the class, and the group",
-    body: "Six through twelve. Classes 11 and 12 ask for the group next, so a commerce student never scrolls past physics.",
+    label: "Land in the right year, and the right group",
+    body: "The class from sign-in opens straight away. Classes 11 and 12 ask for the group next, so a commerce student never scrolls past physics.",
   },
   {
     stages: ["subject"],

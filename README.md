@@ -5,8 +5,12 @@ embedded in the hero. The app covers Tamil Nadu state board classes 6 to 12.
 
 The demo flow:
 
-OTP sign-in → class (6–12) → group (11 and 12 only) → subject → chapter → concept →
+Sign in (name, class, roll number) → group (11 and 12 only) → subject → chapter → concept →
 concept page → audio-visual example.
+
+The class is collected on the sign-in form, so the class picker is skipped on the way in. It is
+still there — pressing back from the group or subject screen opens it, which is how a student
+switches year.
 
 ## Run it
 
@@ -22,8 +26,7 @@ webfonts from Google Fonts, so the machine needs internet access on that first r
 
 ## Using the demo
 
-- Enter any ten digit mobile number, then any four digit code. Nothing is sent or stored.
-- The keypad on screen works, and so does the number row on your keyboard.
+- Enter any name, tap a class, and enter any roll number. Nothing is sent or stored.
 - Classes 6 to 10 go straight to subjects. Classes 11 and 12 ask for the group first.
 - On a concept page, the amber button plays the worked example step by step.
 - The numbered list in "How it works", and the indigo panel beside it, follow whichever screen
@@ -149,8 +152,9 @@ yet — see "Not built yet" below.
 
 ## Content structure
 
-Junior content (classes 6 to 9) lives in `data/curriculum.js`. Classes 10, 11 and 12 live in
-`data/senior.js` and are merged in. Both use the same shape:
+Junior content (classes 6 to 9) lives in `data/curriculum.js`. Classes 11 and 12 live in
+`data/senior.js`. Class 10 lives in `data/class10/`, one file per subject, and is merged in
+last. All three use the same shape:
 
 ```js
 ["Chapter title", [
@@ -161,6 +165,60 @@ Junior content (classes 6 to 9) lives in `data/curriculum.js`. Classes 10, 11 an
 
 The last value picks the animation in the audio-visual player: `bar`, `grid`, `cycle`, `stack`
 or `map`.
+
+### How much is shown
+
+`LIMITS` in `curriculum.js` caps how much of each subject the app displays:
+
+```js
+export const LIMITS = { chapters: Infinity, concepts: Infinity };
+```
+
+It is currently off, so everything in the data is browsable. Set both to 5 for a
+trimmed demo — because the data is stored in SCERT's printed order, that shows chapters 1 to 5
+of the real syllabus rather than a hand-picked set. Nothing else has to change.
+
+`syllabusCounts(classId, subjectId)` returns the untruncated chapter and concept totals, so a
+screen can say "showing 5 of 23 chapters" if you want the slice to be visible to the student.
+
+### Class 10
+
+Class 10 is the only year whose chapter list is taken from the real SSLC textbook index rather
+than written as a sample. Chapter titles, their order and their counts match the 2018 revision:
+
+| Subject | Chapters | Concepts | Notes |
+| --- | --- | --- | --- |
+| Maths | 8 | 64 | sub-topics as the textbook lists them |
+| Science | 23 | 129 | Physics 1–6, Chemistry 7–11, Biology 12–22, Computer Science 23 |
+| Tamil | 9 இயல் | 49 | lessons numbered as the book numbers them, so 1.1, 1.2 line up |
+| English | 7 units | 21 | each unit carries its Prose, Poem and Supplementary reader |
+| Social Science | 27 | 54 | History 10, Geography 7, Civics 5, Economics 5, branch named in the title |
+
+Maths and Science carry the full sub-topic list. Tamil, English and Social Science carry every
+real chapter but a teaching selection of concepts inside each, not the complete sub-topic list.
+
+The **concepts inside each chapter are a teaching selection, not the full sub-topic list**, and
+have not been checked by a subject teacher. The Tamil literature entries deliberately describe
+the text and how to approach it rather than paraphrasing the poems. Get all of this reviewed
+before it goes in front of students.
+
+### Known gaps against the real syllabus
+
+The model in `data/curriculum.js` does not yet match the state board in five places:
+
+- **Biology is two subjects in 11 and 12.** Botany and Zoology have separate books and separate
+  board papers. `GROUPS` still carries a single `biology` entry.
+- **Classes 6 to 8 Science and Social Science come in three term volumes**, each with its own
+  chapter numbering, so "Chapter 1" occurs three times in a year. The model assumes one
+  continuous list per subject.
+- **Part I is not always Tamil.** French, Hindi, Sanskrit, Urdu, Telugu, Kannada and Malayalam
+  are all options.
+- **The commerce group's fourth subject varies** between Business Maths and Statistics and
+  Computer Applications.
+- **Arts and vocational groups are missing**, and are common in government schools.
+
+Computer Science and Computer Applications are also two different subjects in 11 and 12, not one
+renamed.
 
 `curriculum.js` also holds the structural exports:
 
@@ -194,8 +252,9 @@ components/
   Logo.jsx             dotted mark + wordmark
   phone/
     Chrome.jsx         device shell, status bar, app bar, list row
-    OtpScreen.jsx      mobile number + four digit code, with keypad
-    ClassScreen.jsx    classes 6 to 12
+    Select.jsx         in-frame dropdown, used by the sign-in form
+    SignInScreen.jsx   name, class and roll number
+    ClassScreen.jsx    classes 6 to 12, also used to switch year
     GroupScreen.jsx    biology, computer science, commerce
     SubjectScreen.jsx  the subjects that class actually studies
     ChapterScreen.jsx  chapter list with a subject dropdown
@@ -204,7 +263,8 @@ components/
     AvPlayer.jsx       the step-through audio-visual overlay
 data/
   curriculum.js        classes 6 to 9, plus all structural exports
-  senior.js            classes 10, 11 and 12
+  senior.js            classes 11 and 12
+  class10/             class 10, one file per subject, real SSLC chapter list
 ```
 
 ## Not built yet

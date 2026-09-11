@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { hasGroups } from "@/data/curriculum";
+import { CLASSES, hasGroups } from "@/data/curriculum";
 import { LangContext } from "./phone/lang";
 import { PhoneShell } from "./phone/Chrome";
-import OtpScreen from "./phone/OtpScreen";
+import SignInScreen from "./phone/SignInScreen";
 import ClassScreen from "./phone/ClassScreen";
 import GroupScreen from "./phone/GroupScreen";
 import SubjectScreen from "./phone/SubjectScreen";
@@ -18,7 +18,7 @@ export default function PhoneDemo({ onStageChange, onGrad = false, reserveY }) {
   const [lang, setLang] = useState("en");
   const [stage, setStage] = useState("auth");
   const [dir, setDir] = useState("forward");
-  const [phone, setPhone] = useState("");
+  const [student, setStudent] = useState(null);
   const [classItem, setClassItem] = useState(null);
   const [group, setGroup] = useState(null);
   const [subject, setSubject] = useState(null);
@@ -54,7 +54,7 @@ export default function PhoneDemo({ onStageChange, onGrad = false, reserveY }) {
   function reset() {
     setDir("back");
     setStage("auth");
-    setPhone("");
+    setStudent(null);
     setClassItem(null);
     setGroup(null);
     setSubject(null);
@@ -87,10 +87,16 @@ export default function PhoneDemo({ onStageChange, onGrad = false, reserveY }) {
       <div className="flex flex-col items-center">
         <PhoneShell onGrad={onGrad} reserveY={reserveY}>
         {stage === "auth" && (
-          <OtpScreen
-            onDone={(numValue) => {
-              setPhone(numValue);
-              forward("class");
+          <SignInScreen
+            onDone={(details) => {
+              // The class comes from the sign-in form, so the class picker is
+              // skipped on the way in. Back from here still reaches it, which is
+              // how a student switches year.
+              const picked = CLASSES.find((c) => c.id === details.classId) ?? null;
+              setStudent(details);
+              setClassItem(picked);
+              setGroup(null);
+              forward(picked && hasGroups(picked.id) ? "group" : "subject");
             }}
           />
         )}
@@ -98,7 +104,8 @@ export default function PhoneDemo({ onStageChange, onGrad = false, reserveY }) {
         {stage === "class" && (
           <ClassScreen
             dir={dir}
-            phone={phone}
+            student={student}
+            current={classItem?.id}
             onSignOut={reset}
             onPick={(c) => {
               setClassItem(c);

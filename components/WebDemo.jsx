@@ -13,17 +13,42 @@ import { LangContext, className as classLabel, subjectName, t } from "./phone/la
 import AvPlayer from "./phone/AvPlayer";
 import AskSheet from "./phone/AskSheet";
 import AiCheck from "./phone/AiCheck";
+import Select from "./phone/Select";
+import Figure from "./phone/Figure";
 import Logo from "./Logo";
 
 /* --------------------------------------------------------------- sign in */
 
+const WEB_INPUT_BASE =
+  "mt-1.5 w-full rounded-xl border bg-mist px-4 py-3 font-display text-[16px] font-semibold text-ink outline-none transition placeholder:font-normal placeholder:text-inkFaint focus:bg-white";
+
+function webInputCls(bad, extra = "") {
+  return `${WEB_INPUT_BASE} ${
+    bad ? "border-alert focus:border-alert" : "border-line focus:border-brand"
+  } ${extra}`;
+}
+
 function AuthCard({ lang, onDone }) {
-  const [step, setStep] = useState("number");
-  const [number, setNumber] = useState("");
-  const [code, setCode] = useState("");
+  const [name, setName] = useState("");
+  const [classId, setClassId] = useState(null);
+  const [roll, setRoll] = useState("");
+  const [error, setError] = useState({ field: "", msg: "" });
+
+  const ready = name.trim().length >= 2 && classId && roll.trim();
+
+  function clearError() {
+    setError({ field: "", msg: "" });
+  }
+
+  function submit() {
+    if (name.trim().length < 2) return setError({ field: "name", msg: t("errName", lang) });
+    if (!classId) return setError({ field: "class", msg: t("errClass", lang) });
+    if (!roll.trim()) return setError({ field: "roll", msg: t("errRoll", lang) });
+    onDone({ name: name.trim(), classId, roll: roll.trim() });
+  }
 
   return (
-    <div className="flex h-full items-center justify-center px-6">
+    <div className="flex h-full items-center justify-center overflow-y-auto px-6 py-10">
       <div className="w-full max-w-sm text-center">
         <div className="flex justify-center">
           <Logo size={72} tone="grad" stacked />
@@ -32,54 +57,76 @@ function AuthCard({ lang, onDone }) {
           {t("tagline", lang)}
         </p>
 
-        {step === "number" ? (
-          <div className="mt-8 text-left">
-            <label className="block text-[12px] font-semibold text-inkSoft">
-              {t("titleIn", lang)}
-            </label>
-            <div className="mt-2 flex items-center gap-2 rounded-xl border border-line bg-mist px-4 py-3 focus-within:border-brand focus-within:bg-white">
-              <span className="font-display text-[15px] font-semibold text-inkFaint">+91</span>
-              <input
-                autoFocus
-                inputMode="numeric"
-                value={number}
-                onChange={(e) => setNumber(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                onKeyDown={(e) => e.key === "Enter" && number.length === 10 && setStep("code")}
-                placeholder="0000000000"
-                className="w-full bg-transparent font-display text-[17px] font-bold tracking-[0.1em] text-ink outline-none placeholder:font-normal placeholder:tracking-normal placeholder:text-inkFaint"
-              />
-            </div>
-            <button
-              onClick={() => number.length === 10 && setStep("code")}
-              disabled={number.length !== 10}
-              className="grad-brand mt-4 w-full rounded-xl py-3 font-display text-[13px] font-bold uppercase tracking-[0.1em] text-white transition hover:brightness-105 disabled:opacity-40"
-            >
-              {t("sendCode", lang)}
-            </button>
-          </div>
-        ) : (
-          <div className="mt-8 text-left">
-            <label className="block text-[12px] font-semibold text-inkSoft">
-              {t("enterCode", lang)}
-            </label>
+        <div className="mt-8 text-left">
+          <h2 className="font-display text-[17px] font-bold text-ink">{t("titleIn", lang)}</h2>
+          <p className="mt-1 text-[13px] leading-relaxed text-inkSoft">{t("subIn", lang)}</p>
+
+          <div className="mt-5">
+            <span className="block font-display text-[11px] font-bold uppercase tracking-[0.08em] text-inkFaint">
+              {t("labelName", lang)}
+            </span>
             <input
               autoFocus
-              inputMode="numeric"
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 4))}
-              onKeyDown={(e) => e.key === "Enter" && code.length === 4 && onDone(number)}
-              placeholder="- - - -"
-              className="mt-2 w-full rounded-xl border border-line bg-mist px-4 py-3 text-center font-display text-[24px] font-bold tracking-[0.5em] text-ink outline-none focus:border-brand focus:bg-white"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                clearError();
+              }}
+              placeholder={t("phName", lang)}
+              aria-invalid={error.field === "name"}
+              autoComplete="off"
+              className={webInputCls(error.field === "name")}
             />
-            <button
-              onClick={() => code.length === 4 && onDone(number)}
-              disabled={code.length !== 4}
-              className="grad-brand mt-4 w-full rounded-xl py-3 font-display text-[13px] font-bold uppercase tracking-[0.1em] text-white transition hover:brightness-105 disabled:opacity-40"
-            >
-              {t("verifyOpen", lang)}
-            </button>
           </div>
-        )}
+
+          <div className="mt-4">
+            <span className="block font-display text-[11px] font-bold uppercase tracking-[0.08em] text-inkFaint">
+              {t("labelClass", lang)}
+            </span>
+            <Select
+              size="md"
+              label={t("labelClass", lang)}
+              placeholder={t("classHint", lang)}
+              value={classId}
+              invalid={error.field === "class"}
+              textClass={lang === "ta" ? "font-tamil" : ""}
+              options={CLASSES.map((c) => ({ value: c.id, label: classLabel(c, lang) }))}
+              onChange={(v) => {
+                setClassId(v);
+                clearError();
+              }}
+            />
+          </div>
+
+          <div className="mt-4">
+            <span className="block font-display text-[11px] font-bold uppercase tracking-[0.08em] text-inkFaint">
+              {t("labelRoll", lang)}
+            </span>
+            <input
+              value={roll}
+              inputMode="numeric"
+              onChange={(e) => {
+                setRoll(e.target.value.replace(/\D/g, "").slice(0, 4));
+                clearError();
+              }}
+              onKeyDown={(e) => e.key === "Enter" && submit()}
+              placeholder={t("phRoll", lang)}
+              aria-invalid={error.field === "roll"}
+              autoComplete="off"
+              className={webInputCls(error.field === "roll", "tracking-[0.12em]")}
+            />
+          </div>
+
+          <p className="mt-2 min-h-[18px] text-[12px] text-alert">{error.msg}</p>
+
+          <button
+            onClick={submit}
+            disabled={!ready}
+            className="grad-brand mt-2 w-full rounded-xl py-3 font-display text-[13px] font-bold uppercase tracking-[0.1em] text-white transition hover:brightness-105 disabled:opacity-40"
+          >
+            {t("continueWord", lang)}
+          </button>
+        </div>
 
         <p className="mt-4 text-[11px] text-inkFaint">{t("demoNote", lang)}</p>
       </div>
@@ -129,7 +176,7 @@ function firstPath(classItem, groupId) {
 
 export default function WebDemo({ toolbar = null }) {
   const [lang, setLang] = useState("en");
-  const [phone, setPhone] = useState("");
+  const [student, setStudent] = useState(null);
   const [overlay, setOverlay] = useState(null);
   // null means the reading pane. "class" and "subject" are the browse pages.
   const [home, setHome] = useState("class");
@@ -147,6 +194,14 @@ export default function WebDemo({ toolbar = null }) {
   function pickClass(id) {
     const next = CLASSES.find((c) => c.id === Number(id));
     setState((s) => ({ ...s, classItem: next, ...firstPath(next, s.group?.id) }));
+  }
+
+  // Class comes from the sign-in form, so a student lands on their own subject
+  // list. The class list stays one click away under the logo.
+  function signIn(details) {
+    setStudent(details);
+    pickClass(details.classId);
+    setHome("subject");
   }
 
   function pickGroup(id) {
@@ -185,12 +240,19 @@ export default function WebDemo({ toolbar = null }) {
   const nextConcept = conceptIndex >= 0 ? chapter.concepts[conceptIndex + 1] : null;
   const prevConcept = conceptIndex > 0 ? chapter.concepts[conceptIndex - 1] : null;
 
+  // The reading pane is a persistent scroll container, so moving between concepts
+  // would otherwise drop the reader partway down the new one.
+  const readingPane = useRef(null);
+  useEffect(() => {
+    readingPane.current?.scrollTo({ top: 0 });
+  }, [concept?.id, home]);
+
   return (
     <LangContext.Provider value={{ lang, setLang }}>
       <div className="flex h-full flex-col bg-white">
         <header className="flex shrink-0 items-center gap-3 border-b border-line px-4 py-2.5 sm:gap-4 sm:px-6">
           <button
-            onClick={() => phone && setHome("class")}
+            onClick={() => student && setHome("class")}
             aria-label="Kalvi ThunAI home"
             className="rounded-lg transition hover:opacity-80"
           >
@@ -211,20 +273,25 @@ export default function WebDemo({ toolbar = null }) {
                 </button>
               ))}
             </div>
-            {phone ? (
-              <button
-                onClick={() => setPhone("")}
-                className="rounded-full border border-line px-3 py-1.5 text-[12px] font-semibold text-inkSoft transition hover:border-brand hover:text-brand"
-              >
-                {t("signOut", lang)}
-              </button>
+            {student ? (
+              <>
+                <span className="hidden max-w-[180px] truncate text-[12px] font-semibold text-inkSoft sm:block">
+                  {student.name} · {t("rollWord", lang)} {student.roll}
+                </span>
+                <button
+                  onClick={() => setStudent(null)}
+                  className="rounded-full border border-line px-3 py-1.5 text-[12px] font-semibold text-inkSoft transition hover:border-brand hover:text-brand"
+                >
+                  {t("signOut", lang)}
+                </button>
+              </>
             ) : null}
           </div>
         </header>
 
-        {!phone ? (
+        {!student ? (
           <div className="min-h-0 flex-1">
-            <AuthCard lang={lang} onDone={setPhone} />
+            <AuthCard lang={lang} onDone={signIn} />
           </div>
         ) : home ? (
           /* browse pages: classes, then the subjects in that class */
@@ -413,7 +480,7 @@ export default function WebDemo({ toolbar = null }) {
             </nav>
 
             {/* full width reading pane */}
-            <div className="min-h-0 flex-1 overflow-y-auto">
+            <div ref={readingPane} className="min-h-0 flex-1 overflow-y-auto">
               {concept ? (
                 <article className="mx-auto max-w-[820px] px-4 py-5 sm:px-10 sm:py-6">
                   <h1 className="heading text-[clamp(1.15rem,4vw,1.5rem)] text-ink">
@@ -424,6 +491,11 @@ export default function WebDemo({ toolbar = null }) {
                     {t("whatItMeans", lang)}
                   </h2>
                   <p className="mt-1 text-[15px] leading-relaxed text-ink">{concept.summary}</p>
+                  {concept.figures?.length ? (
+                    <div className="mt-4 max-w-[440px]">
+                      <Figure name={concept.figures[0]} />
+                    </div>
+                  ) : null}
 
                   <div className="relative mt-5 rounded-lg border border-ink/20 px-5 pb-3.5 pt-4">
                     <h2 className="absolute -top-[9px] left-4 bg-white px-2 font-display text-[12px] font-bold text-brand">
@@ -447,6 +519,38 @@ export default function WebDemo({ toolbar = null }) {
                       </li>
                     ))}
                   </ol>
+
+                  {concept.deeper ? (
+                    <>
+                      <h2 className="mt-6 font-display text-[12px] font-bold text-inkFaint">
+                        {t("goingDeeper", lang)}
+                      </h2>
+                      <p className="mt-1 text-[14.5px] leading-relaxed text-inkSoft">
+                        {concept.deeper}
+                      </p>
+                    </>
+                  ) : null}
+
+                  {concept.mistake ? (
+                    <>
+                      <h2 className="mt-6 border-t border-line pt-4 font-display text-[12px] font-bold text-alert">
+                        {t("commonMistake", lang)}
+                      </h2>
+                      <p className="mt-1 text-[14.5px] leading-relaxed text-ink">{concept.mistake}</p>
+                    </>
+                  ) : null}
+
+                  {concept.tryIt ? (
+                    <>
+                      <h2 className="mt-6 border-t border-line pt-4 font-display text-[12px] font-bold text-brand">
+                        {t("tryIt", lang)}
+                      </h2>
+                      <p className="mt-1 font-display text-[15px] font-bold leading-relaxed text-ink">
+                        {concept.tryIt}
+                      </p>
+                      <p className="mt-1.5 text-[12px] text-inkFaint">{t("noAnswerGiven", lang)}</p>
+                    </>
+                  ) : null}
 
                   <div className="mt-5">
                     <button

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { StatusBar } from "./Chrome";
+import { useSpeech } from "./useSpeech";
 import { t, useLang } from "./lang";
 
 // Composed from the concept's own material. Used when no model key is configured,
@@ -28,6 +29,20 @@ export default function AskSheet({ concept, classItem, subject, onClose, web = f
   const [busy, setBusy] = useState(false);
   const endRef = useRef(null);
   const inputRef = useRef(null);
+
+  // Whatever was already typed when the mic started. Interim results are appended
+  // to it rather than replacing the field, so dictation can follow typing.
+  const typedBefore = useRef("");
+
+  const mic = useSpeech({
+    lang,
+    onText: (text) => setField(`${typedBefore.current} ${text}`.trim()),
+  });
+
+  function toggleMic() {
+    if (!mic.listening) typedBefore.current = field;
+    mic.toggle();
+  }
 
   // Put the cursor in the field as soon as the sheet opens, so a student can start
   // typing without a second tap.
@@ -160,7 +175,11 @@ export default function AskSheet({ concept, classItem, subject, onClose, web = f
       ) : null}
 
       <div className="border-t border-line px-4 pb-6 pt-3">
-        <div className="flex items-center gap-2 rounded-full border border-line bg-mist p-1 pl-4 transition focus-within:border-brand focus-within:bg-white">
+        <div
+          className={`flex items-center gap-1 rounded-full border bg-mist p-1 pl-4 transition focus-within:bg-white ${
+            mic.listening ? "border-alert bg-white" : "border-line focus-within:border-brand"
+          }`}
+        >
           <input
             ref={inputRef}
             value={field}
@@ -168,11 +187,53 @@ export default function AskSheet({ concept, classItem, subject, onClose, web = f
             onKeyDown={(e) => {
               if (e.key === "Enter") send(field);
             }}
-            placeholder={t("askPlaceholder", lang)}
+            placeholder={mic.listening ? t("micListening", lang) : t("askPlaceholder", lang)}
             className="min-w-0 flex-1 bg-transparent text-[13px] text-ink outline-none placeholder:text-inkFaint"
           />
+
+          {/* Hidden rather than disabled where the browser has no recogniser: a
+              dead mic invites tapping it and wondering why nothing happens. */}
+          {mic.supported ? (
+            <button
+              onClick={toggleMic}
+              aria-label={mic.listening ? t("micStop", lang) : t("micStart", lang)}
+              aria-pressed={mic.listening}
+              title={mic.listening ? t("micStop", lang) : t("micStart", lang)}
+              className={`grid h-9 w-9 shrink-0 place-items-center rounded-full transition ${
+                mic.listening
+                  ? "bg-alert text-white"
+                  : "text-inkFaint hover:bg-brandTint hover:text-brand"
+              }`}
+            >
+              {mic.listening ? (
+                <span className="flex h-4 items-end gap-[2px]" aria-hidden>
+                  {[0, 1, 2].map((i) => (
+                    <span
+                      key={i}
+                      className="wave-bar w-[3px] rounded-full bg-white"
+                      style={{ height: "14px", animationDelay: `${i * 120}ms` }}
+                    />
+                  ))}
+                </span>
+              ) : (
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden>
+                  <rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" strokeWidth="1.8" />
+                  <path
+                    d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              )}
+            </button>
+          ) : null}
+
           <button
-            onClick={() => send(field)}
+            onClick={() => {
+              mic.stop();
+              send(field);
+            }}
             disabled={busy || !field.trim()}
             aria-label={t("askSend", lang)}
             className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand text-white transition hover:bg-brandSoft disabled:opacity-35"
@@ -189,7 +250,7 @@ export default function AskSheet({ concept, classItem, subject, onClose, web = f
           </button>
         </div>
         <p className="mt-2 text-center text-[10px] leading-relaxed text-inkFaint">
-          {t("askGuard", lang)}
+          {mic.listening ? t("micHint", lang) : t("askGuard", lang)}
         </p>
       </div>
     </div>

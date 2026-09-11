@@ -4,6 +4,7 @@
 // youtubeId is optional. Add one and the player shows the video tab for that concept.
 
 import { seniorRaw } from "./senior";
+import { class10Raw } from "./class10";
 
 export const CLASSES = [
   { id: 6, tamil: "வகுப்பு 6" },
@@ -16,11 +17,11 @@ export const CLASSES = [
 ];
 
 // The chip colour is the only place subject colour is used. Everything else stays neutral.
+// Tamil sits last in every list, matching how the school timetable reads.
 export const SUBJECTS = [
-  { id: "tamil", name: "Tamil", tamil: "தமிழ்", color: "#A23246" },
-  { id: "english", name: "English", tamil: "ஆங்கிலம்", color: "#1F6FB2" },
   { id: "maths", name: "Maths", tamil: "கணிதம்", color: "#6A3FA0" },
   { id: "science", name: "Science", tamil: "அறிவியல்", color: "#0E7C66" },
+  { id: "english", name: "English", tamil: "ஆங்கிலம்", color: "#1F6FB2" },
   { id: "social", name: "Social Science", tamil: "சமூக அறிவியல்", color: "#B4711A" },
   { id: "physics", name: "Physics", tamil: "இயற்பியல்", color: "#2A5FA8" },
   { id: "chemistry", name: "Chemistry", tamil: "வேதியியல்", color: "#157A6E" },
@@ -30,10 +31,12 @@ export const SUBJECTS = [
   { id: "commerce", name: "Commerce", tamil: "வணிகவியல்", color: "#0E6E8C" },
   { id: "economics", name: "Economics", tamil: "பொருளியல்", color: "#9A3B7A" },
   { id: "busmaths", name: "Business Maths", tamil: "வணிகக் கணிதம்", color: "#7A4B9E" },
+  { id: "tamil", name: "Tamil", tamil: "தமிழ்", color: "#A23246" },
 ];
 
 // Classes 11 and 12 are taught in groups. Classes 6 to 10 share one core list.
-export const CORE_SUBJECTS = ["tamil", "english", "maths", "science", "social"];
+// English sits third and Tamil last, so the two language papers do not open the list.
+export const CORE_SUBJECTS = ["maths", "science", "english", "social", "tamil"];
 
 export const GROUPS = [
   {
@@ -41,21 +44,21 @@ export const GROUPS = [
     name: "Biology group",
     tamil: "உயிரியல் குழு",
     note: "Physics, Chemistry, Biology and Maths",
-    subjects: ["tamil", "english", "physics", "chemistry", "biology", "maths"],
+    subjects: ["english", "physics", "chemistry", "biology", "maths", "tamil"],
   },
   {
     id: "cs",
     name: "Computer science group",
     tamil: "கணினி அறிவியல் குழு",
     note: "Physics, Chemistry, Maths and Computer Science",
-    subjects: ["tamil", "english", "physics", "chemistry", "maths", "compsci"],
+    subjects: ["english", "physics", "chemistry", "maths", "compsci", "tamil"],
   },
   {
     id: "commerce",
     name: "Commerce group",
     tamil: "வணிகவியல் குழு",
     note: "Accountancy, Commerce, Economics and Business Maths",
-    subjects: ["tamil", "english", "accountancy", "commerce", "economics", "busmaths"],
+    subjects: ["english", "accountancy", "commerce", "economics", "busmaths", "tamil"],
   },
 ];
 
@@ -364,16 +367,33 @@ const raw = {
   },
 };
 
+// How much of each subject the app shows. The data is stored in the order SCERT
+// prints it, so a limit of 5 would show chapters 1 to 5 of the real syllabus
+// rather than a hand-picked set.
+//
+// Currently off, so Class 10 Maths shows all 8 chapters and Science all 23.
+// Put the numbers back to 5 to return to the trimmed demo.
+export const LIMITS = { chapters: Infinity, concepts: Infinity };
+
+// What the full syllabus holds, recorded before the slice so the app can still
+// say how much sits behind the demo.
+const fullCounts = {};
+
 function expand(source) {
   const out = {};
   Object.entries(source).forEach(([cls, subjects]) => {
     out[cls] = {};
+    fullCounts[cls] = {};
     Object.entries(subjects).forEach(([subjectId, chapters]) => {
-      out[cls][subjectId] = chapters.map(([title, concepts], ci) => ({
+      fullCounts[cls][subjectId] = {
+        chapters: chapters.length,
+        concepts: chapters.reduce((n, [, list]) => n + list.length, 0),
+      };
+      out[cls][subjectId] = chapters.slice(0, LIMITS.chapters).map(([title, concepts], ci) => ({
         id: `${cls}-${subjectId}-${ci + 1}`,
         number: ci + 1,
         title,
-        concepts: concepts.map(([name, summary, formula, steps, av, video], ni) => ({
+        concepts: concepts.slice(0, LIMITS.concepts).map(([name, summary, formula, steps, av, video, extra], ni) => ({
           id: `${cls}-${subjectId}-${ci + 1}-${ni + 1}`,
           number: `${ci + 1}.${ni + 1}`,
           name,
@@ -382,6 +402,16 @@ function expand(source) {
           steps: steps.split(" | "),
           av,
           video: video ?? null,
+          // Optional longer theory. Absent on most concepts, so every consumer
+          // has to treat these as possibly null or empty.
+          figures: extra?.figures ?? (extra?.figure ? [extra.figure] : []),
+          images: extra?.images ?? [],
+          deeper: extra?.deeper ?? null,
+          mistake: extra?.mistake ?? null,
+          tryIt: extra?.tryIt ?? null,
+          // A full worked sum for the Steps tab: a question plus [line, note] rows
+          // revealed one at a time. Falls back to `steps` where this is absent.
+          work: extra?.work ?? null,
         })),
       }));
     });
@@ -389,7 +419,13 @@ function expand(source) {
   return out;
 }
 
-export const curriculum = expand({ ...raw, ...seniorRaw });
+export const curriculum = expand({ ...raw, ...seniorRaw, 10: class10Raw });
+
+// Chapter and concept counts for the whole subject, ignoring the demo slice.
+// Useful for a line such as "showing 5 of 23 chapters".
+export function syllabusCounts(classId, subjectId) {
+  return fullCounts[classId]?.[subjectId] ?? { chapters: 0, concepts: 0 };
+}
 
 export function getChapters(classId, subjectId) {
   return curriculum[classId]?.[subjectId] ?? [];

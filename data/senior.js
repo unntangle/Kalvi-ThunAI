@@ -1,80 +1,10 @@
-// Classes 10, 11 and 12. Same shape as the junior data in curriculum.js:
+// Classes 11 and 12. Same shape as the junior data in curriculum.js:
 // seniorRaw[class][subjectId] = [ [chapterTitle, [ [concept, summary, keyLine, "step | step | step", avType] ] ] ]
+//
+// Class 10 lives in data/class10/ instead. Its chapter list follows the real
+// SSLC textbook index and is long enough to deserve a file per subject.
 
 export const seniorRaw = {
-  10: {
-    tamil: [
-      ["வல்லினம் மிகும் இடங்கள்", [
-        ["மிகும் இடங்கள்", "Certain grammatical joins double the hard consonant, and the rule is testable.", "வேற்றுமைத் தொகையில் மிகும்", "Take மரம் + கிளை | The join calls for வல்லினம் | It becomes மரக்கிளை", "stack"],
-        ["மிகா இடங்கள்", "After a finite verb or a வினையெச்சம், the hard consonant does not double.", "வினைமுற்றின் பின் மிகாது", "Take வந்தான் + கண்ணன் | A finite verb ends the clause | No doubling, so வந்தான் கண்ணன்", "bar"],
-      ]],
-      ["அணி இலக்கணம்", [
-        ["பிறிது மொழிதல் அணி", "A general truth is stated so that a particular case is understood.", "general line, particular meaning", "The poet states a common truth | The context points at one person | The indirect praise is the அணி", "stack"],
-        ["எடுத்துக்காட்டு உவமை அணி", "A comparison is offered as a worked example rather than a single word.", "comparison given as an illustration", "The poet describes a scene | The scene stands for the subject | The extended comparison is the அணி", "bar"],
-      ]],
-      ["யாப்பு — செய்யுள் அமைப்பு", [
-        ["வெண்பா", "The most tightly ruled Tamil metre, with a fixed ending and four lines.", "ஈற்றடி மூன்று சீர்", "Count the சீர் in each line | The last line carries three | The ending marks it as a வெண்பா", "grid"],
-        ["ஆசிரியப்பா", "A freer metre where the lines run to four சீர் and the ending is open.", "அடிதோறும் நான்கு சீர்", "Mark the சீர் across a line | Four appear in each | The open ending makes it ஆசிரியப்பா", "grid"],
-      ]],
-    ],
-    english: [
-      ["Reported speech", [
-        ["Reporting statements", "Shift the tense one step back and change every pronoun to the reporter's point of view.", "said that + one tense back", "He said, 'I have finished' | Shift have to had, I to he | He said that he had finished", "bar"],
-        ["Reporting commands", "A command becomes an infinitive after a verb such as told, asked or ordered.", "told + object + to + verb", "She said, 'Close the door' | Choose the reporting verb told | She told him to close the door", "cycle"],
-      ]],
-      ["Voice in context", [
-        ["Choosing the voice", "Put the thing you want the reader to notice at the front of the sentence.", "front position carries the emphasis", "The committee approved the plan | The plan is what matters here | The plan was approved by the committee", "bar"],
-        ["Passive in report writing", "Reports use the passive because the process matters more than who performed it.", "process first, actor optional", "Write: we heated the solution | The actor is not the point | The solution was heated to 80 degrees", "stack"],
-      ]],
-      ["Writing a report", [
-        ["Structure of a report", "A heading, a lead line answering what and when, the detail, and a closing line.", "heading, lead, detail, close", "Name the event in the heading | Answer what and when in the first line | Add detail, then close", "stack"],
-        ["Keeping it factual", "A report records what happened; opinion belongs in an article, not here.", "state facts, attribute opinions", "Write only what was observed | If an opinion is needed, attribute it | Leave your own view out", "bar"],
-      ]],
-    ],
-    maths: [
-      ["Relations and functions", [
-        ["What makes a relation a function", "Every input must have exactly one output for the relation to be a function.", "one input, one output", "Take {(1,2),(1,3)} | The input 1 gives two outputs | So it is a relation but not a function", "grid"],
-        ["Composition of functions", "Apply the inner function first, then feed its result into the outer one.", "(f ∘ g)(x) = f(g(x))", "f(x) = 2x, g(x) = x + 3 | g(1) = 4 | f(4) = 8, so (f ∘ g)(1) = 8", "bar"],
-      ]],
-      ["Sequences and series", [
-        ["Arithmetic progression", "Each term rises by the same fixed amount, so the nth term is a straight line rule.", "aₙ = a + (n − 1)d", "a = 5, d = 3 | For the 10th term, n − 1 = 9 | 5 + 9 × 3 = 32", "bar"],
-        ["Sum of an AP", "Pair the first term with the last and the sum falls out immediately.", "Sₙ = n/2 (a + l)", "First 10 terms of 5, 8, 11… last is 32 | n/2 = 5 | 5 × (5 + 32) = 185", "grid"],
-      ]],
-      ["Trigonometry", [
-        ["The basic identity", "The identity follows straight from Pythagoras applied to a unit circle.", "sin²θ + cos²θ = 1", "Take sin θ = 3/5 | sin²θ = 9/25 | cos²θ = 16/25, so cos θ = 4/5", "cycle"],
-        ["Heights and distances", "Draw the right triangle first, label the angle of elevation, then pick the ratio.", "tan θ = opposite / adjacent", "A tower is seen at 30° from 30 m away | tan 30° = h / 30 | h = 30 / √3 ≈ 17.3 m", "grid"],
-      ]],
-    ],
-    science: [
-      ["Laws of motion", [
-        ["Newton's third law", "Forces always come in pairs, equal in size and opposite in direction, on two different bodies.", "action and reaction on different bodies", "A gun fires a bullet forward | The gas pushes back on the gun | The gun recoils", "cycle"],
-        ["Conservation of momentum", "With no outside force, the total momentum before a collision equals the total after.", "m₁u₁ + m₂u₂ = m₁v₁ + m₂v₂", "A 2 kg ball at 3 m/s hits a still 1 kg ball | Total before is 6 kg·m/s | The total after must also be 6", "bar"],
-      ]],
-      ["Optics", [
-        ["Refraction and Snell's law", "Light bends at a boundary because its speed changes between the two media.", "n₁ sin i = n₂ sin r", "Light enters glass from air | The speed drops | The ray bends towards the normal", "bar"],
-        ["Lenses and image formation", "Where the object sits relative to the focus decides whether the image is real or virtual.", "1/v − 1/u = 1/f", "Object at 30 cm, f = 10 cm | 1/v = 1/10 − 1/30 | v = 15 cm, a real image", "grid"],
-      ]],
-      ["Periodic classification", [
-        ["Periods and groups", "Position in the table predicts how an element behaves before you ever test it.", "group decides valence electrons", "Sodium sits in group 1 | So it has one outer electron | It reacts by losing that electron", "grid"],
-        ["Periodic trends", "Atomic size falls across a period and rises down a group, and reactivity follows.", "size falls across, rises down", "Compare sodium and chlorine | Chlorine is further right | Its atom is smaller despite more electrons", "bar"],
-      ]],
-    ],
-    social: [
-      ["The First World War and after", [
-        ["Causes of the war", "Alliances, arms build-up and colonial rivalry turned one assassination into a world war.", "alliances plus rivalry", "Rival alliance blocs form | Colonial competition sharpens them | One killing in 1914 triggers the rest", "map"],
-        ["The peace and its failure", "A settlement that humiliates the loser stores up the next conflict.", "harsh terms, unstable peace", "Germany is blamed and fined | Resentment builds through the 1920s | It feeds the crisis of the 1930s", "stack"],
-      ]],
-      ["India — relief and drainage", [
-        ["Physical divisions", "The Himalayas, the plains, the plateau, the coasts and the islands each behave differently.", "mountain, plain, plateau, coast", "Start at the northern mountains | Move south to the plains | Then the plateau, then the coast", "map"],
-        ["River systems", "Himalayan rivers run all year, peninsular rivers depend on the monsoon.", "perennial versus seasonal", "The Ganga is fed by snowmelt | The Kaveri is fed by rain | Only one of them runs through summer", "map"],
-      ]],
-      ["The Indian Constitution", [
-        ["Preamble and its ideals", "The Preamble states what the Constitution is trying to build before any article does.", "sovereign, socialist, secular, democratic, republic", "Read the Preamble aloud | Note each word it claims | Every later article serves one of them", "stack"],
-        ["Amending the Constitution", "The Constitution can be changed, but the basic structure cannot be removed.", "amendment allowed, basic structure protected", "Parliament passes an amendment | Courts test it against the basic structure | Anything that destroys it falls", "cycle"],
-      ]],
-    ],
-  },
-
   11: {
     tamil: [
       ["இலக்கிய வரலாறு", [

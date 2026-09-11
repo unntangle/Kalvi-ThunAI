@@ -1,0 +1,212 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #ffffff;
+    color: #0e1424;
+    font-family: var(--font-body), var(--font-tamil), system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  ::selection {
+    background: #1c8be6;
+    color: #ffffff;
+  }
+
+  :focus-visible {
+    outline: 2px solid #2246c7;
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  .heading {
+    font-family: var(--font-display), system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.14;
+  }
+
+  .ghost-word {
+    font-family: var(--font-display), system-ui, sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: #e9eef6;
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .ghost-on-grad {
+    color: rgba(255, 255, 255, 0.13);
+  }
+
+  /* The house gradient: deep blue through mid blue into cyan. */
+  .grad-brand {
+    background-image: linear-gradient(112deg, #3452d6 0%, #1c8be6 54%, #17c3d4 100%);
+  }
+
+  .grad-brand-soft {
+    background-image: linear-gradient(112deg, #4a68e0 0%, #2f9aea 54%, #2fcdda 100%);
+  }
+
+  /* The magenta pill, used only for the one action that must be found. */
+  .grad-accent {
+    background-image: linear-gradient(92deg, #8b2fd6 0%, #e14fc0 100%);
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    padding: 0.72rem 1.6rem;
+    font-family: var(--font-display), system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease;
+  }
+
+  .pill-brand {
+    background-image: linear-gradient(112deg, #3452d6 0%, #1c8be6 54%, #17c3d4 100%);
+    color: #fff;
+  }
+  .pill-brand:hover {
+    filter: brightness(1.06);
+  }
+
+  /* Black pill, the primary call to action. */
+  .pill-ink {
+    background: #0e1424;
+    color: #fff;
+  }
+  .pill-ink:hover {
+    background: #1c2540;
+  }
+
+  .pill-accent {
+    background-image: linear-gradient(92deg, #8b2fd6 0%, #e14fc0 100%);
+    color: #fff;
+  }
+  .pill-accent:hover {
+    filter: brightness(1.06);
+  }
+
+  .pill-outline {
+    border: 1px solid #dce3ee;
+    color: #0e1424;
+  }
+  .pill-outline:hover {
+    border-color: #2246c7;
+    color: #2246c7;
+  }
+
+  /* Outline on the gradient panel. */
+  .pill-ghost {
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    color: #fff;
+  }
+  .pill-ghost:hover {
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  .round-btn {
+    display: grid;
+    place-items: center;
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 999px;
+    border: 1px solid #dce3ee;
+    color: #0e1424;
+    background: #fff;
+    transition: all 180ms ease;
+  }
+  .round-btn:hover {
+    border-color: #2246c7;
+    color: #2246c7;
+  }
+  .round-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* iPhone 17 Pro Max frame. Drawn at true point size, then scaled by JS to fit
+     whatever height and width the viewport actually has. See PhoneShell. */
+  .device-scale > * {
+    transform-origin: top left;
+  }
+
+  .screen-enter-forward {
+    animation: slide-forward 260ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+  .screen-enter-back {
+    animation: slide-back 260ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+  .sheet-enter {
+    animation: sheet-up 280ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+}
+
+@keyframes slide-forward {
+  from { opacity: 0; transform: translateX(22px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slide-back {
+  from { opacity: 0; transform: translateX(-22px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes sheet-up {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes caret {
+  0%, 45% { opacity: 1; }
+  46%, 100% { opacity: 0; }
+}
+.caret { animation: caret 1.05s steps(1, end) infinite; }
+
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
+.wave-bar { transform-origin: center; animation: wave 900ms ease-in-out infinite; }
+
+/* The kolam ring of the mark turns slowly. The centre dot stays put. */
+@keyframes logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.logo-spin {
+  transform-box: view-box;
+  transform-origin: 24px 24px;
+  animation: logo-spin 14s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

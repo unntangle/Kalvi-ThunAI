@@ -188,7 +188,7 @@ export default function WebDemo({ toolbar = null }) {
   return (
     <LangContext.Provider value={{ lang, setLang }}>
       <div className="flex h-full flex-col bg-white">
-        <header className="flex shrink-0 items-center gap-4 border-b border-line px-6 py-2.5">
+        <header className="flex shrink-0 items-center gap-3 border-b border-line px-4 py-2.5 sm:gap-4 sm:px-6">
           <button
             onClick={() => phone && setHome("class")}
             aria-label="Kalvi ThunAI home"
@@ -229,10 +229,10 @@ export default function WebDemo({ toolbar = null }) {
         ) : home ? (
           /* browse pages: classes, then the subjects in that class */
           <div className="min-h-0 flex-1 overflow-y-auto">
-            <div className="mx-auto max-w-[900px] px-10 py-12">
+            <div className="mx-auto max-w-[900px] px-4 py-8 sm:px-10 sm:py-12">
               {home === "class" ? (
                 <>
-                  <h1 className="heading text-[28px] text-ink">{t("whichClass", lang)}</h1>
+                  <h1 className="heading text-[clamp(1.4rem,5vw,1.75rem)] text-ink">{t("whichClass", lang)}</h1>
                   <p className="mt-2 text-[14px] text-inkSoft">{t("classNote", lang)}</p>
                   <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                     {CLASSES.map((c) => {
@@ -279,7 +279,7 @@ export default function WebDemo({ toolbar = null }) {
                     {t("whichClass", lang)}
                   </button>
 
-                  <h1 className="heading mt-3 text-[28px] text-ink">
+                  <h1 className="heading mt-3 text-[clamp(1.4rem,5vw,1.75rem)] text-ink">
                     {classLabel(classItem, lang)}
                   </h1>
 
@@ -301,7 +301,7 @@ export default function WebDemo({ toolbar = null }) {
                     </div>
                   ) : null}
 
-                  <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
+                  <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {subjects.map((s) => (
                       <button
                         key={s.id}
@@ -340,7 +340,7 @@ export default function WebDemo({ toolbar = null }) {
                     {classLabel(classItem, lang)}
                   </button>
 
-                  <h1 className="heading mt-3 flex items-center gap-3 text-[28px] text-ink">
+                  <h1 className="heading mt-3 flex items-center gap-3 text-[clamp(1.4rem,5vw,1.75rem)] text-ink">
                     <span
                       className="h-7 w-1.5 rounded-full"
                       style={{ backgroundColor: subject?.color }}
@@ -353,7 +353,7 @@ export default function WebDemo({ toolbar = null }) {
                     {chapters.map((ch) => (
                       <div
                         key={ch.id}
-                        className="rounded-2xl border border-line bg-white p-5 shadow-raised"
+                        className="rounded-2xl border border-line bg-white p-4 shadow-raised sm:p-5"
                       >
                         <div className="flex items-baseline gap-3">
                           <span
@@ -368,7 +368,7 @@ export default function WebDemo({ toolbar = null }) {
                           <h2 className="font-display text-[16px] font-bold text-ink">{ch.title}</h2>
                         </div>
 
-                        <div className="mt-3 flex flex-wrap gap-2 pl-11">
+                        <div className="mt-3 flex flex-wrap gap-2 sm:pl-11">
                           {ch.concepts.map((c) => (
                             <button
                               key={c.id}
@@ -393,7 +393,7 @@ export default function WebDemo({ toolbar = null }) {
           <div className="relative flex min-h-0 flex-1 flex-col">
             {/* breadcrumbs: every level is a dropdown, so the whole syllabus is
                 reachable without leaving the page */}
-            <nav className="flex shrink-0 flex-wrap items-center gap-0.5 border-b border-line px-6 py-2">
+            <nav className="no-scrollbar flex shrink-0 flex-nowrap items-center gap-0.5 overflow-x-auto border-b border-line px-4 py-2 sm:flex-wrap sm:px-6">
               <Crumb label={classLabel(classItem, lang)} onClick={() => setHome("class")} />
               {hasGroups(classItem.id) ? (
                 <>
@@ -415,8 +415,8 @@ export default function WebDemo({ toolbar = null }) {
             {/* full width reading pane */}
             <div className="min-h-0 flex-1 overflow-y-auto">
               {concept ? (
-                <article className="mx-auto max-w-[820px] px-10 py-6">
-                  <h1 className="heading text-[24px] text-ink">
+                <article className="mx-auto max-w-[820px] px-4 py-5 sm:px-10 sm:py-6">
+                  <h1 className="heading text-[clamp(1.15rem,4vw,1.5rem)] text-ink">
                     {concept.number} {concept.name}
                   </h1>
 
@@ -494,7 +494,7 @@ export default function WebDemo({ toolbar = null }) {
             </div>
 
             {/* ask bar */}
-            <div className="shrink-0 border-t border-line px-6 py-3">
+            <div className="shrink-0 border-t border-line px-4 py-3 sm:px-6">
               <div className="mx-auto flex max-w-[820px] items-center gap-2">
                 <button
                   onClick={() => setOverlay("ask")}
@@ -519,10 +519,12 @@ export default function WebDemo({ toolbar = null }) {
             </div>
 
             {overlay && concept ? (
-              <div className="absolute inset-0 z-40 grid place-items-center bg-ink/45 p-8 backdrop-blur-sm">
+              <div className="absolute inset-0 z-40 grid place-items-center bg-ink/45 p-3 backdrop-blur-sm sm:p-8">
                 <div
-                  className={`relative flex max-h-full flex-col overflow-hidden rounded-2xl bg-white shadow-card ${
-                    overlay === "video" ? "h-[440px] w-[680px]" : "h-[560px] w-[520px]"
+                  className={`relative flex max-h-full w-full flex-col overflow-hidden rounded-2xl bg-white shadow-card ${
+                    overlay === "video"
+                      ? "h-[70vh] max-h-[440px] max-w-[680px]"
+                      : "h-[85vh] max-h-[560px] max-w-[520px]"
                   }`}
                 >
                   {overlay === "video" ? (

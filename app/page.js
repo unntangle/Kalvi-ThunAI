@@ -26,7 +26,7 @@ function ViewToggle({ view, setView, onGrad = false }) {
             key={v.id}
             onClick={() => setView(v.id)}
             aria-pressed={active}
-            className={`rounded-full px-4 py-1 font-display text-[11.5px] font-bold uppercase tracking-[0.08em] transition ${
+            className={`rounded-full px-3 py-1 font-display text-[11px] font-bold uppercase tracking-[0.08em] transition sm:px-4 sm:text-[11.5px] ${
               active
                 ? onGrad
                   ? "bg-white text-brand"
@@ -57,9 +57,9 @@ export default function Home() {
   }
 
   return (
-    <main id="top" className="h-[100dvh] overflow-hidden bg-white p-3 sm:p-4">
-      <div className="grad-brand relative flex h-full flex-col overflow-hidden rounded-[24px] px-4 py-4 sm:rounded-[32px]">
-        <div className="flex shrink-0 items-center justify-between gap-4">
+    <main id="top" className="h-[100dvh] overflow-hidden bg-white p-2 sm:p-4">
+      <div className="grad-brand relative flex h-full flex-col overflow-hidden rounded-[20px] px-3 py-3 sm:rounded-[32px] sm:px-4 sm:py-4">
+        <div className="flex shrink-0 items-center justify-between gap-3">
           <Logo size={34} tone="mono" />
           <ViewToggle view={view} setView={setView} onGrad />
         </div>

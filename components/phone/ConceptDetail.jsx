@@ -4,14 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import { AppBar, Screen, StatusBar } from "./Chrome";
 import AskSheet from "./AskSheet";
 import Figure from "./Figure";
-import { className, subjectName, t, useLang } from "./lang";
+import { className, localize, subjectName, t, useLang } from "./lang";
 
 export default function ConceptDetail({
   dir,
   classItem,
   subject,
   chapter,
-  concept,
+  concept: source,
   onBack,
   onPlay,
   onNext,
@@ -22,12 +22,16 @@ export default function ConceptDetail({
   const [asking, setAsking] = useState(false);
   const pane = useRef(null);
 
+  // Everything below reads the localised copy. The untranslated original is only
+  // needed by AskSheet, which sends it to the model.
+  const concept = localize(source, lang);
+
   // Next and Back swap the concept without remounting this screen, so the pane
   // keeps whatever scroll position it had. Send it back to the top on every
   // change, or the student lands halfway down the new concept.
   useEffect(() => {
     pane.current?.scrollTo({ top: 0 });
-  }, [concept.id]);
+  }, [source.id]);
 
   return (
     <Screen dir={dir}>
@@ -189,7 +193,7 @@ export default function ConceptDetail({
 
       {asking ? (
         <AskSheet
-          concept={concept}
+          concept={source}
           classItem={classItem}
           subject={subject}
           onClose={() => setAsking(false)}

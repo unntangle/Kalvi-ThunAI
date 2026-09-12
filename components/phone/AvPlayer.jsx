@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { StatusBar } from "./Chrome";
 import Figure, { figureCaption } from "./Figure";
-import { t, useLang } from "./lang";
+import { localize, t, useLang } from "./lang";
 
 // Put a YouTube id here and every concept without its own video plays it. Useful for
 // demoing the player before any videos are curated. Leave empty in production.
@@ -15,11 +15,17 @@ let sessionVideoId = "";
 
 export default function AvPlayer({ concept, classItem, subject, onClose, web = false }) {
   const { lang } = useLang();
-  const steps = concept.steps;
+
+  // Displayed text comes from the localised copy. The YouTube query below stays
+  // on the English `concept`: video titles are indexed in English even for
+  // Tamil-medium channels, and the query already appends "Tamil" when it needs
+  // to steer the results.
+  const shown = localize(concept, lang);
+  const steps = shown.steps;
 
   // A concept with a full worked sum drives the Steps tab from that instead of the
   // three-line summary. The sum is what a student would actually write down.
-  const work = concept.work?.lines?.length ? concept.work : null;
+  const work = shown.work?.lines?.length ? shown.work : null;
   const total = work ? work.lines.length : steps.length;
 
   const [index, setIndex] = useState(0);
@@ -171,7 +177,7 @@ export default function AvPlayer({ concept, classItem, subject, onClose, web = f
           <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-white/45">
             {t("workedExample", lang)}
           </p>
-          <p className="truncate font-display text-[15px] font-bold">{concept.name}</p>
+          <p className="truncate font-display text-[15px] font-bold">{shown.name}</p>
         </div>
         <button
           onClick={onClose}
@@ -222,7 +228,7 @@ export default function AvPlayer({ concept, classItem, subject, onClose, web = f
                 <figure key={`i${i}`} className="overflow-hidden rounded-2xl border border-nightLine bg-nightSoft">
                   {/* Curated photographs. Plain img on purpose: these are remote
                       URLs, not files in the project. */}
-                  <img src={item.src} alt={item.caption ?? concept.name} className="w-full" />
+                  <img src={item.src} alt={item.caption ?? shown.name} className="w-full" />
                   <figcaption className="px-3 py-2 text-[11.5px] leading-relaxed text-white/55">
                     {item.caption}
                     {item.credit ? <span className="text-white/30"> · {item.credit}</span> : null}

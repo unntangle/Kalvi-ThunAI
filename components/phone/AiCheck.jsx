@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { CLASSES, SUBJECTS, getChapters } from "@/data/curriculum";
 import { StatusBar } from "./Chrome";
-import { className, subjectName, t, useLang } from "./lang";
+import { className, localize, subjectName, t, useLang } from "./lang";
 
 // A scripted diagnosis, standing in for the model. The point of the flow is that the
 // photo is of the student's own attempt, not of the question, so the app can say where
@@ -193,7 +193,7 @@ export default function AiCheck({ onClose, onOpenConcept, web = false }) {
                   </span>
                   <span className="pt-0.5">
                     <span className="block font-display text-[13.5px] font-bold leading-snug text-ink">
-                      {step.concept.name}
+                      {localize(step.concept, lang).name}
                     </span>
                     <span className="block text-[11.5px] text-inkFaint">
                       {className(step.classItem, lang)} · {subjectName(step.subject, lang)}

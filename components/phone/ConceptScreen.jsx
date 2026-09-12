@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { getChapters } from "@/data/curriculum";
 import { AppBar, ListRow, Screen, StatusBar } from "./Chrome";
-import { className, subjectName, t, useLang } from "./lang";
+import { chapterTitle, className, localize, subjectName, t, useLang } from "./lang";
 
 export default function ConceptScreen({
   dir,
@@ -34,7 +34,7 @@ export default function ConceptScreen({
           className="flex w-full items-start justify-between gap-3 rounded-xl border border-line bg-mist px-3.5 py-2.5 text-left transition hover:border-brand/40"
         >
           <span className="font-display text-[14px] font-bold leading-snug text-ink">
-            {chapter.title}
+            {chapterTitle(chapter, lang)}
           </span>
           <svg
             width="15"
@@ -62,7 +62,7 @@ export default function ConceptScreen({
                 }`}
               >
                 <span className="font-display text-inkFaint">{ch.number}</span>
-                <span className="font-display leading-snug">{ch.title}</span>
+                <span className="font-display leading-snug">{chapterTitle(ch, lang)}</span>
               </button>
             ))}
           </div>
@@ -72,16 +72,21 @@ export default function ConceptScreen({
           {t("conceptsIn", lang)}
         </h2>
         <div className="space-y-2.5">
-          {chapter.concepts.map((c) => (
-            <ListRow
-              key={c.id}
-              lead={c.number}
-              color={subject.color}
-              title={c.name}
-              sub={c.summary}
-              onClick={() => onPick(c)}
-            />
-          ))}
+          {chapter.concepts.map((c) => {
+            // Localise for display only. onPick still hands the original
+            // concept upward, so the screens above keep their `ta` payload.
+            const shown = localize(c, lang);
+            return (
+              <ListRow
+                key={c.id}
+                lead={c.number}
+                color={subject.color}
+                title={shown.name}
+                sub={shown.summary}
+                onClick={() => onPick(c)}
+              />
+            );
+          })}
         </div>
       </div>
     </Screen>

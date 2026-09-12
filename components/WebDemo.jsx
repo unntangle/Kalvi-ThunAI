@@ -9,7 +9,15 @@ import {
   hasGroups,
   subjectsFor,
 } from "@/data/curriculum";
-import { LangContext, className as classLabel, subjectName, t } from "./phone/lang";
+import {
+  LangContext,
+  chapterTitle,
+  className as classLabel,
+  groupName,
+  localize,
+  subjectName,
+  t,
+} from "./phone/lang";
 import AvPlayer from "./phone/AvPlayer";
 import AskSheet from "./phone/AskSheet";
 import AiCheck from "./phone/AiCheck";
@@ -188,6 +196,12 @@ export default function WebDemo({ toolbar = null }) {
   });
 
   const { classItem, group, subject, chapter, concept } = state;
+
+  // The reading pane below renders `shown`; `concept` stays untranslated so that
+  // pickConcept, the prev/next lookup and the overlays keep working off ids and
+  // the full record.
+  const shown = concept ? localize(concept, lang) : null;
+
   const subjects = subjectsFor(classItem.id, group?.id);
   const chapters = subject ? getChapters(classItem.id, subject.id) : [];
 
@@ -362,7 +376,7 @@ export default function WebDemo({ toolbar = null }) {
                               : "border border-line text-inkSoft hover:border-brand hover:text-brand"
                           }`}
                         >
-                          {g.name}
+                          {groupName(g, lang)}
                         </button>
                       ))}
                     </div>
@@ -432,7 +446,9 @@ export default function WebDemo({ toolbar = null }) {
                           >
                             {ch.number}
                           </span>
-                          <h2 className="font-display text-[16px] font-bold text-ink">{ch.title}</h2>
+                          <h2 className="font-display text-[16px] font-bold text-ink">
+                            {chapterTitle(ch, lang)}
+                          </h2>
                         </div>
 
                         <div className="mt-3 flex flex-wrap gap-2 sm:pl-11">
@@ -445,7 +461,7 @@ export default function WebDemo({ toolbar = null }) {
                               }}
                               className="rounded-full border border-line px-3.5 py-1.5 text-[12.5px] text-ink transition hover:border-brand hover:text-brand"
                             >
-                              {c.number} {c.name}
+                              {c.number} {localize(c, lang).name}
                             </button>
                           ))}
                         </div>
@@ -465,18 +481,18 @@ export default function WebDemo({ toolbar = null }) {
               {hasGroups(classItem.id) ? (
                 <>
                   <Sep />
-                  <Crumb label={group.name} onClick={() => setHome("subject")} />
+                  <Crumb label={groupName(group, lang)} onClick={() => setHome("subject")} />
                 </>
               ) : null}
               <Sep />
               <Crumb label={subjectName(subject, lang)} onClick={() => setHome("subject")} />
               <Sep />
               <Crumb
-                label={`${chapter.number}. ${chapter.title}`}
+                label={`${chapter.number}. ${chapterTitle(chapter, lang)}`}
                 onClick={() => setHome("chapter")}
               />
               <Sep />
-              <Crumb current label={`${concept.number} ${concept.name}`} />
+              <Crumb current label={`${shown.number} ${shown.name}`} />
             </nav>
 
             {/* full width reading pane */}
@@ -484,13 +500,13 @@ export default function WebDemo({ toolbar = null }) {
               {concept ? (
                 <article className="mx-auto max-w-[820px] px-4 py-5 sm:px-10 sm:py-6">
                   <h1 className="heading text-[clamp(1.15rem,4vw,1.5rem)] text-ink">
-                    {concept.number} {concept.name}
+                    {shown.number} {shown.name}
                   </h1>
 
                   <h2 className="mt-5 font-display text-[12px] font-bold text-inkFaint">
                     {t("whatItMeans", lang)}
                   </h2>
-                  <p className="mt-1 text-[15px] leading-relaxed text-ink">{concept.summary}</p>
+                  <p className="mt-1 text-[15px] leading-relaxed text-ink">{shown.summary}</p>
                   {concept.figures?.length ? (
                     <div className="mt-4 max-w-[440px]">
                       <Figure name={concept.figures[0]} />
@@ -502,7 +518,7 @@ export default function WebDemo({ toolbar = null }) {
                       {t("rememberThis", lang)}
                     </h2>
                     <p className="font-display text-[17px] font-bold leading-snug text-ink">
-                      {concept.formula}
+                      {shown.formula}
                     </p>
                   </div>
 
@@ -510,7 +526,7 @@ export default function WebDemo({ toolbar = null }) {
                     {t("workedExample", lang)}
                   </h2>
                   <ol className="mt-2 space-y-1.5">
-                    {concept.steps.map((s, i) => (
+                    {shown.steps.map((s, i) => (
                       <li key={i} className="flex gap-3 text-[14.5px] leading-relaxed text-ink">
                         <span className="mt-[4px] grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brandTint font-display text-[11px] font-bold text-brand">
                           {i + 1}
@@ -520,33 +536,33 @@ export default function WebDemo({ toolbar = null }) {
                     ))}
                   </ol>
 
-                  {concept.deeper ? (
+                  {shown.deeper ? (
                     <>
                       <h2 className="mt-6 font-display text-[12px] font-bold text-inkFaint">
                         {t("goingDeeper", lang)}
                       </h2>
                       <p className="mt-1 text-[14.5px] leading-relaxed text-inkSoft">
-                        {concept.deeper}
+                        {shown.deeper}
                       </p>
                     </>
                   ) : null}
 
-                  {concept.mistake ? (
+                  {shown.mistake ? (
                     <>
                       <h2 className="mt-6 border-t border-line pt-4 font-display text-[12px] font-bold text-alert">
                         {t("commonMistake", lang)}
                       </h2>
-                      <p className="mt-1 text-[14.5px] leading-relaxed text-ink">{concept.mistake}</p>
+                      <p className="mt-1 text-[14.5px] leading-relaxed text-ink">{shown.mistake}</p>
                     </>
                   ) : null}
 
-                  {concept.tryIt ? (
+                  {shown.tryIt ? (
                     <>
                       <h2 className="mt-6 border-t border-line pt-4 font-display text-[12px] font-bold text-brand">
                         {t("tryIt", lang)}
                       </h2>
                       <p className="mt-1 font-display text-[15px] font-bold leading-relaxed text-ink">
-                        {concept.tryIt}
+                        {shown.tryIt}
                       </p>
                       <p className="mt-1.5 text-[12px] text-inkFaint">{t("noAnswerGiven", lang)}</p>
                     </>

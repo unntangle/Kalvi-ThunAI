@@ -8,8 +8,9 @@ export function useLang() {
   return useContext(LangContext);
 }
 
-// Interface chrome only. Curriculum content in data/ stays as authored, since a real
-// build would carry a Tamil and an English version of each concept.
+// Interface chrome. Curriculum content is translated too, but it lives in data/ta/
+// rather than here, and reaches the screens through localize() at the bottom of
+// this file.
 const STR = {
   // welcome
   tagline: { en: "Your AI study companion", ta: "உங்கள் AI கற்றல் துணை" },
@@ -176,7 +177,7 @@ export function t(key, lang) {
 }
 
 // Content labels. Subjects, classes and groups carry both languages in data/,
-// so they follow the switch too. Chapter and concept titles stay as authored.
+// so they follow the switch too.
 export function pick(en, ta, lang) {
   return lang === "ta" ? ta || en : en;
 }
@@ -191,4 +192,44 @@ export function className(classItem, lang) {
 
 export function groupName(group, lang) {
   return pick(group.name, group.tamil, lang);
+}
+
+/* --------------------------------------------------- curriculum content */
+
+// Two subjects are never switched. Tamil is already Tamil, and the English
+// paper's grammar examples stop teaching anything once translated: "Ravi walks
+// to school" is the lesson, not a sentence about Ravi.
+const ENGLISH_ONLY = ["tamil", "english"];
+
+export function translatable(subjectId) {
+  return !ENGLISH_ONLY.includes(subjectId);
+}
+
+export function chapterTitle(chapter, lang) {
+  return lang === "ta" ? chapter.titleTa || chapter.title : chapter.title;
+}
+
+// Returns a concept with its text fields swapped for Tamil where a translation
+// exists. Falls back per field rather than per concept, so a half-finished entry
+// shows the Tamil it has and English for the rest instead of nothing.
+//
+// Untranslated fields are common and expected while the packs are being written,
+// so this must never throw on a missing `ta`.
+export function localize(concept, lang) {
+  const ta = concept?.ta;
+  if (lang !== "ta" || !ta) return concept;
+
+  return {
+    ...concept,
+    name: ta.name || concept.name,
+    summary: ta.summary || concept.summary,
+    // Pure notation reads the same in both languages, so most Tamil entries
+    // leave `formula` out on purpose and inherit the English one.
+    formula: ta.formula || concept.formula,
+    steps: ta.steps?.length ? ta.steps : concept.steps,
+    deeper: ta.deeper || concept.deeper,
+    mistake: ta.mistake || concept.mistake,
+    tryIt: ta.tryIt || concept.tryIt,
+    work: ta.work?.lines?.length ? ta.work : concept.work,
+  };
 }

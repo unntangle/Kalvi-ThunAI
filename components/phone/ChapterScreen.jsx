@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { subjectsFor, getChapters } from "@/data/curriculum";
 import { AppBar, ListRow, Screen, StatusBar } from "./Chrome";
-import { className, subjectName, t, useLang } from "./lang";
+import { chapterTitle, className, subjectName, t, useLang } from "./lang";
 
 export default function ChapterScreen({
   dir,
@@ -86,7 +86,7 @@ export default function ChapterScreen({
               key={ch.id}
               lead={ch.number}
               color={subject.color}
-              title={ch.title}
+              title={chapterTitle(ch, lang)}
               sub={`${ch.concepts.length} ${t("concepts", lang)}`}
               onClick={() => onPick(ch)}
             />

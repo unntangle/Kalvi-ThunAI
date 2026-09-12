@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { StatusBar } from "./Chrome";
 import { useSpeech } from "./useSpeech";
-import { t, useLang } from "./lang";
+import { localize, t, useLang } from "./lang";
 
 // Composed from the concept's own material. Used when no model key is configured,
 // so the flow still demos and the answer still comes from the textbook content.
@@ -22,8 +22,14 @@ function localAnswer(concept, lang) {
   ].join("\n");
 }
 
-export default function AskSheet({ concept, classItem, subject, onClose, web = false }) {
+export default function AskSheet({ concept: source, classItem, subject, onClose, web = false }) {
   const { lang } = useLang();
+
+  // The model is grounded on whichever language the student is reading, so a
+  // Tamil answer quotes the same wording that is on the concept page behind
+  // this sheet rather than translating the English on the fly.
+  const concept = localize(source, lang);
+
   const [messages, setMessages] = useState([]);
   const [field, setField] = useState("");
   const [busy, setBusy] = useState(false);

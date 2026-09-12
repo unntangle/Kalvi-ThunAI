@@ -5,6 +5,7 @@
 
 import { seniorRaw } from "./senior";
 import { class10Raw } from "./class10";
+import { taChapters, taConcepts } from "./ta";
 
 export const CLASSES = [
   { id: 6, tamil: "வகுப்பு 6" },
@@ -393,6 +394,10 @@ function expand(source) {
         id: `${cls}-${subjectId}-${ci + 1}`,
         number: ci + 1,
         title,
+        // Tamil chapter title, or null where the pack has not reached this
+        // chapter yet. Consumers go through chapterTitle() in phone/lang.js
+        // rather than reading either field directly.
+        titleTa: taChapters[`${cls}-${subjectId}-${ci + 1}`] ?? null,
         concepts: concepts.slice(0, LIMITS.concepts).map(([name, summary, formula, steps, av, video, extra], ni) => ({
           id: `${cls}-${subjectId}-${ci + 1}-${ni + 1}`,
           number: `${ci + 1}.${ni + 1}`,
@@ -402,6 +407,10 @@ function expand(source) {
           steps: steps.split(" | "),
           av,
           video: video ?? null,
+          // The whole Tamil entry for this concept, field for field. Partial
+          // entries are fine: localize() falls back per field, so a pack can
+          // ship a name and summary today and the worked sum later.
+          ta: taConcepts[`${cls}-${subjectId}-${ci + 1}-${ni + 1}`] ?? null,
           // Optional longer theory. Absent on most concepts, so every consumer
           // has to treat these as possibly null or empty.
           figures: extra?.figures ?? (extra?.figure ? [extra.figure] : []),

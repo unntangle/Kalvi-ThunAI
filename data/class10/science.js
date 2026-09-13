@@ -1,10 +1,21 @@
 // Class 10 Science — Samacheer Kalvi (2018 revision).
 // 23 chapters: Physics 1–6, Chemistry 7–11, Biology 12–22, Computer Science 23.
 // Each chapter carries the sub-topics the textbook lists inside it.
+//
+// The youtubeId slot (6th in each tuple) takes either of two things:
+//
+//   "/videos/first-law.mp4"   a file in public/videos, played inline
+//   "dQw4w9WgXcQ"             an 11-character YouTube id, played in an embed
+//
+// The leading slash is what tells them apart. Self-hosted files are preferred:
+// they need no network, carry no branding, and do not offer the student a wall
+// of unrelated suggestions when the video ends.
+//
+// null leaves the Video tab showing its empty state.
 
 export const science = [
   ["Laws of Motion", [
-    ["Newton's first law and inertia", "A body keeps doing what it was doing until an outside force changes it.", "no net force, no change in motion", "A bus brakes suddenly | No force acted on you | You keep moving forward", "cycle", "DurMU9c7hUw", {
+    ["Newton's first law and inertia", "A body keeps doing what it was doing until an outside force changes it.", "no net force, no change in motion", "A bus brakes suddenly | No force acted on you | You keep moving forward", "cycle", "/videos/newtons-first-law.mp4", {
       figures: ["inertia-bus", "coin-card"],
       deeper: "Inertia is not a force. Nothing pushes you forward when the bus brakes — the point is that nothing pushed you backwards either, so you carry on at the speed you already had. Mass is the measure of inertia, which is why a loaded lorry is harder to start and harder to stop than an empty one.",
       mistake: "Saying a force throws you forward when the bus stops. No forward force exists. The bus slowed and you did not.",
@@ -19,7 +30,7 @@ export const science = [
         ],
       },
     }],
-    ["Newton's second law", "Force is what changes momentum, and mass decides how much force it takes.", "F = ma", "Mass 5 kg, acceleration 2 m/s² | Multiply them | The force needed is 10 N", "bar", "ZpbqEiD1FO0", {
+    ["Newton's second law", "Force is what changes momentum, and mass decides how much force it takes.", "F = ma", "Mass 5 kg, acceleration 2 m/s² | Multiply them | The force needed is 10 N", "bar", "/videos/newtons-second-law.mp4", {
       figures: ["force-mass-accel", "force-accel-graph"],
       deeper: "The law is really about momentum: force equals the rate at which momentum changes. F = ma is that statement for a body whose mass stays constant. Read as a proportion it says two things at once — for a fixed mass, more force gives more acceleration, and for a fixed force, more mass gives less.",
       mistake: "Treating F = ma as a formula for the force a moving body 'has'. A body has momentum, not force. Force is what changes it.",
@@ -34,7 +45,7 @@ export const science = [
         ],
       },
     }],
-    ["Newton's third law", "Forces come in pairs, equal in size and opposite in direction, on two different bodies.", "action and reaction on different bodies", "A gun fires a bullet forward | The gas pushes back on the gun | The gun recoils", "cycle", "jk7CQKKJOrw", {
+    ["Newton's third law", "Forces come in pairs, equal in size and opposite in direction, on two different bodies.", "action and reaction on different bodies", "A gun fires a bullet forward | The gas pushes back on the gun | The gun recoils", "cycle", "/videos/newtons-third-law.mp4", {
       figures: ["action-reaction", "rocket-thrust"],
       deeper: "The phrase that matters is 'on two different bodies'. Action and reaction never cancel out, because they never act on the same thing. The gas pushes the bullet forward and the bullet's gas pushes the gun back — two bodies, two effects. If both forces acted on one body, nothing would ever accelerate.",
       mistake: "Concluding that action and reaction cancel, so nothing moves. They act on different bodies, so they cannot cancel.",
@@ -57,7 +68,7 @@ export const science = [
   ]],
 
   ["Optics", [
-    ["Refraction of light", "Light bends at a boundary because its speed changes between the two media.", "n₁ sin i = n₂ sin r", "Light passes from air into glass | Its speed drops | The ray bends towards the normal", "bar", "uow4TrKWZAA", {
+    ["Refraction of light", "Light bends at a boundary because its speed changes between the two media.", "n₁ sin i = n₂ sin r", "Light passes from air into glass | Its speed drops | The ray bends towards the normal", "bar", null, {
       figures: ["refraction-ray", "stick-in-water"],
       deeper: "The bending is a consequence of the speed change, not a separate rule. Going into a denser medium the light slows, so the ray bends towards the normal; coming back out it speeds up and bends away. A ray that arrives straight along the normal does not bend at all, because there is no sideways difference for it to respond to.",
       mistake: "Measuring the angles from the surface instead of from the normal. Both i and r are measured from the normal.",
@@ -73,7 +84,7 @@ export const science = [
         ],
       },
     }],
-    ["Refractive index", "Refractive index compares the speed of light in vacuum with its speed in the medium.", "n = c / v", "Light travels slower in water than in air | Divide c by that slower speed | The answer, about 1.33, is water's refractive index", "bar", "CROVpI-07HI", {
+    ["Refractive index", "Refractive index compares the speed of light in vacuum with its speed in the medium.", "n = c / v", "Light travels slower in water than in air | Divide c by that slower speed | The answer, about 1.33, is water's refractive index", "bar", null, {
       figures: ["refractive-index", "refractive-index-table"],
       deeper: "Because c is the fastest anything travels, n is always greater than 1, and a bigger n simply means a slower medium. It has no unit, since it is a speed divided by a speed. The relative index between two media is the ratio of their individual values, which is what Snell's law is really comparing.",
       mistake: "Giving the refractive index a unit. It is a ratio of two speeds, so the units cancel.",
@@ -89,7 +100,7 @@ export const science = [
         ],
       },
     }],
-    ["Total internal reflection", "Past the critical angle the light stops leaving the medium and reflects back instead.", "beyond the critical angle, no refraction", "Light travels from glass towards air | Increase the angle of incidence | Past the critical angle it reflects entirely", "cycle", "2O3EgK46EcE", {
+    ["Total internal reflection", "Past the critical angle the light stops leaving the medium and reflects back instead.", "beyond the critical angle, no refraction", "Light travels from glass towards air | Increase the angle of incidence | Past the critical angle it reflects entirely", "cycle", null, {
       figures: ["total-internal-reflection", "optical-fibre"],
       deeper: "Two conditions have to hold together: the light must be going from the denser medium to the rarer one, and the angle of incidence must exceed the critical angle. At exactly the critical angle the refracted ray grazes along the boundary at 90°. This is what keeps a signal inside an optical fibre and what makes a diamond sparkle.",
       mistake: "Expecting total internal reflection going from air into glass. It only happens denser to rarer, never the other way.",

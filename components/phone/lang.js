@@ -114,11 +114,13 @@ const STR = {
   tabPhotos: { en: "Photos", ta: "படங்கள்" },
   tabSteps: { en: "Steps", ta: "படிகள்" },
   noVideoYet: {
-    en: "No video linked to this concept yet.",
-    ta: "இந்தக் கருத்துக்கு விடியோ இன்னும் இணைக்கப்படவில்லை.",
+    en: "Video for this concept is on the way.",
+    ta: "இந்தக் கருத்துக்கான விடியோ விரைவில் வரும்.",
   },
-  searchYouTube: { en: "Find one on YouTube", ta: "YouTube இல் தேடு" },
-  findingVideo: { en: "Finding a video", ta: "விடியோ தேடப்படுகிறது" },
+  noVideoNote: {
+    en: "This is a demo application. Every concept will have one.",
+    ta: "இது ஒரு மாதிரிச் செயலி. ஒவ்வொரு கருத்துக்கும் விடியோ இடம்பெறும்.",
+  },
   goBack: { en: "Go back", ta: "பின் செல்" },
 
   // check my work

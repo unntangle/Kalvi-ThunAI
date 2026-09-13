@@ -5,6 +5,10 @@
 //   [concept, summary, keyLine, "step | step | step", avType, youtubeId?, extra?]
 // ] ] ]
 //
+// youtubeId is null on every concept. The slot is kept rather than removed so the
+// tuple shape stays fixed — dropping it would shift `extra` into the video
+// position — and so a curated id can be pasted straight in later.
+//
 // extra is an optional object carrying the longer theory shown on the concept page:
 //   figures  keys into components/phone/Figure.jsx. The first is shown inline on
 //            the concept page; the Photos tab of the player shows them all.
@@ -15,11 +19,11 @@
 //   work     a full worked sum for the Steps tab
 
 export const maths = [
-  // The three concepts that carry a video, a diagram set and a worked sum lead the
+  // The three concepts that carry a diagram set and a worked sum lead the
   // chapter, so the richest material is what a student meets first. The rest of
   // the chapter follows in textbook order behind them.
   ["Relations and Functions", [
-    ["Cartesian product", "Pairing every element of one set with every element of another builds the product set.", "n(A × B) = n(A) × n(B)", "A has 3 elements, B has 4 | Every a pairs with every b | A × B holds 12 ordered pairs", "grid", "-fGJVEDLnn8", {
+    ["Cartesian product", "Pairing every element of one set with every element of another builds the product set.", "n(A × B) = n(A) × n(B)", "A has 3 elements, B has 4 | Every a pairs with every b | A × B holds 12 ordered pairs", "grid", null, {
       figures: ["cartesian-grid", "cartesian-tree"],
       deeper: "The order inside a pair is part of the pair. (1, 2) and (2, 1) are different elements, so A × B and B × A are different sets unless A and B are the same. This is also where the rest of the chapter comes from: a relation is any subset of A × B, and a function is a subset with one extra condition on it.",
       mistake: "Treating A × B and B × A as the same set. They are the same size, but not the same elements.",
@@ -35,7 +39,7 @@ export const maths = [
       },
     }],
 
-    ["When a relation is a function", "Every input must have exactly one output, or the relation is not a function.", "one input, one output", "Take {(1,2), (1,3)} | The input 1 gives two outputs | So it is a relation but not a function", "grid", "_dgvDBcknnY", {
+    ["When a relation is a function", "Every input must have exactly one output, or the relation is not a function.", "one input, one output", "Take {(1,2), (1,3)} | The input 1 gives two outputs | So it is a relation but not a function", "grid", null, {
       figures: ["function-map", "vertical-line-test"],
       deeper: "The vertical line test is this same rule drawn rather than written: if any vertical line meets the graph twice, one input has two outputs and the relation fails. Notice what the rule does not say. Two different inputs are allowed to share one output, and the relation is still a function.",
       mistake: "Rejecting a relation because two inputs give the same output. That is permitted. Only one input giving two outputs breaks it.",
@@ -51,7 +55,7 @@ export const maths = [
       },
     }],
 
-    ["Composition of functions", "Apply the inner function first, then feed its result into the outer one.", "(f ∘ g)(x) = f(g(x))", "f(x) = 2x, g(x) = x + 3 | g(1) = 4 | f(4) = 8, so (f ∘ g)(1) = 8", "bar", "NAKQ336ycgE", {
+    ["Composition of functions", "Apply the inner function first, then feed its result into the outer one.", "(f ∘ g)(x) = f(g(x))", "f(x) = 2x, g(x) = x + 3 | g(1) = 4 | f(4) = 8, so (f ∘ g)(1) = 8", "bar", null, {
       figures: ["function-machine", "composition-order"],
       deeper: "Composition is not commutative, so f ∘ g and g ∘ f are usually different functions and the order is part of the answer. Read f ∘ g from the right, which is what the brackets in f(g(x)) already tell you to do. For the composition to exist at all, every output of g has to be something f is allowed to accept.",
       mistake: "Reading left to right and applying f first. The inner function always runs first.",
@@ -83,7 +87,7 @@ export const maths = [
   ]],
 
   ["Numbers and Sequences", [
-    ["Euclid's division lemma", "Any division can be written as one exact statement, and that statement drives the HCF algorithm.", "a = bq + r, 0 ≤ r < b", "Divide 273 by 119 | 273 = 119 × 2 + 35 | Repeat with 119 and 35 until the remainder is 0", "stack", "GIi7a2WaTBI", {
+    ["Euclid's division lemma", "Any division can be written as one exact statement, and that statement drives the HCF algorithm.", "a = bq + r, 0 ≤ r < b", "Divide 273 by 119 | 273 = 119 × 2 + 35 | Repeat with 119 and 35 until the remainder is 0", "stack", null, {
       figures: ["euclid-lemma", "euclid-ladder"],
       deeper: "The force of the lemma is in the condition on r. Because the remainder is strictly smaller than the divisor, repeating the step drives it down to zero in a finite number of rounds. The last non-zero remainder is the HCF. Euclid's algorithm is nothing more than this one lemma applied again and again.",
       mistake: "Letting r equal b. The condition is 0 ≤ r < b, so a remainder as large as the divisor means the quotient was taken too small.",
@@ -100,7 +104,7 @@ export const maths = [
       },
     }],
 
-    ["Arithmetic progression", "Each term rises by the same fixed amount, so the nth term is a straight line rule.", "aₙ = a + (n − 1)d", "a = 5, d = 3 | For the 10th term, n − 1 = 9 | 5 + 9 × 3 = 32", "bar", "DqgorwhXFAE", {
+    ["Arithmetic progression", "Each term rises by the same fixed amount, so the nth term is a straight line rule.", "aₙ = a + (n − 1)d", "a = 5, d = 3 | For the 10th term, n − 1 = 9 | 5 + 9 × 3 = 32", "bar", null, {
       figures: ["ap-ladder", "ap-vs-gp"],
       deeper: "Because d never changes, plotting the terms against their position gives points sitting on a straight line of slope d. That is why the nth term formula reads like the equation of a line. To test any sequence, subtract each term from the one after it; if every difference is the same number, it is an AP and that number is d.",
       mistake: "Multiplying by n instead of n − 1. The first term needs no jumps at all, so reaching the tenth takes nine.",
@@ -117,7 +121,7 @@ export const maths = [
       },
     }],
 
-    ["Geometric progression", "Each term is the previous one multiplied by a fixed ratio, so growth is multiplicative.", "aₙ = a rⁿ⁻¹", "a = 3, r = 2 | For the 5th term, r⁴ = 16 | 3 × 16 = 48", "bar", "mleAusXs2JY", {
+    ["Geometric progression", "Each term is the previous one multiplied by a fixed ratio, so growth is multiplicative.", "aₙ = a rⁿ⁻¹", "a = 3, r = 2 | For the 5th term, r⁴ = 16 | 3 × 16 = 48", "bar", null, {
       figures: ["gp-doubling", "ap-vs-gp"],
       deeper: "Where an AP adds the same amount each time, a GP multiplies by it, so once r is above 1 the terms climb far faster than any AP. If r sits between 0 and 1 the terms shrink towards zero instead. The test is division rather than subtraction: divide each term by the one before it, and a constant answer means a GP with that answer as r.",
       mistake: "Using rⁿ instead of rⁿ⁻¹. The first term is a × r⁰, so the exponent always runs one behind the position.",

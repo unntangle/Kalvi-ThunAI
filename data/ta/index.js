@@ -42,9 +42,38 @@ function merge(key) {
 export const taChapters = merge("chapters");
 export const taConcepts = merge("concepts");
 
-// How much Tamil exists so far. Useful for a coverage line in the admin view and
-// for spotting a pack that failed to import.
+// How much Tamil exists. Read by the dev check below, and available to any admin
+// view that wants to report coverage.
 export const taCoverage = {
   chapters: Object.keys(taChapters).length,
   concepts: Object.keys(taConcepts).length,
+  packs: PACKS.length,
 };
+
+// Fail loudly in development rather than quietly serving English.
+//
+// Every field falls back to English when a translation is missing, which is the
+// right behaviour for a half-finished pack but makes total failure invisible: a
+// bad import, a stale .next bundle and a renamed id all look identical to "not
+// translated yet". These checks turn that silence into a console message.
+//
+// The spot check uses Class 10 Science 1.1 because it is the concept furthest
+// from the id generator's simplest case. If that one resolves, the wiring holds.
+if (process.env.NODE_ENV !== "production" && typeof window !== "undefined") {
+  if (taCoverage.concepts === 0) {
+    console.error(
+      "[ta] No Tamil concepts merged. A pack failed to import, or the bundle is stale. " +
+        "Stop the dev server, delete .next, and start it again."
+    );
+  } else if (!taConcepts["10-science-1-1"]) {
+    console.error(
+      "[ta] Packs loaded but 10-science-1-1 is missing. An id no longer matches the " +
+        "chapter or concept order in data/class10/science.js."
+    );
+  } else {
+    console.info(
+      `[ta] Tamil loaded: ${taCoverage.chapters} chapters, ${taCoverage.concepts} concepts, ` +
+        `${taCoverage.packs} packs.`
+    );
+  }
+}

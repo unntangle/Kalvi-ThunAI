@@ -1,17 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { StatusBar } from "./Chrome";
 import Figure, { figureCaption } from "./Figure";
 import { localize, t, useLang } from "./lang";
 
-// Put a YouTube id here and every concept without its own video plays it. Useful for
-// demoing the player before any videos are curated. Leave empty in production.
-const DEMO_VIDEO_ID = "smRJoM6T0EQ";
-
-// Set by pasting a link in the player. Lives for the page session and applies to every
-// concept, so one paste is enough to demo the whole flow.
-let sessionVideoId = "";
+// A YouTube id here plays on every concept that has no video of its own. Empty by
+// design: the Video tab should show its empty state until a real video is chosen
+// for a concept, rather than serving a placeholder that looks curated.
+const DEMO_VIDEO_ID = "";
 
 export default function AvPlayer({ concept, classItem, subject, onClose, web = false }) {
   const { lang } = useLang();
@@ -30,10 +27,6 @@ export default function AvPlayer({ concept, classItem, subject, onClose, web = f
 
   const [index, setIndex] = useState(0);
   const [mode, setMode] = useState("video");
-  const [pasted, setPasted] = useState("");
-  const [linkField, setLinkField] = useState("");
-  const [auto, setAuto] = useState({ status: "idle" });
-  const requested = useRef("");
 
   // The generic step animation was built for worked sums, so it stays on the maths
   // subjects. Any concept that carries a full worked sum of its own gets the tab
@@ -41,75 +34,17 @@ export default function AvPlayer({ concept, classItem, subject, onClose, web = f
   const STEP_SUBJECTS = ["maths", "busmaths"];
   const hasSteps = Boolean(work) || (subject ? STEP_SUBJECTS.includes(subject.id) : false);
 
-  // Demo affordance: paste any YouTube link to preview it in place. In a real build the
-  // id comes from the concept data instead.
-  function parseYouTube(value) {
-    const v = value.trim();
-    if (!v) return "";
-    const patterns = [
-      /youtu\.be\/([A-Za-z0-9_-]{11})/,
-      /[?&]v=([A-Za-z0-9_-]{11})/,
-      /\/embed\/([A-Za-z0-9_-]{11})/,
-      /\/shorts\/([A-Za-z0-9_-]{11})/,
-      /^([A-Za-z0-9_-]{11})$/,
-    ];
-    for (const p of patterns) {
-      const m = v.match(p);
-      if (m) return m[1];
-    }
-    return "";
-  }
+  // A video appears only because somebody put it in the data. There is no paste
+  // box and no automatic lookup, so nothing can surface on screen that was not
+  // chosen for this concept.
+  const source = concept.video || DEMO_VIDEO_ID || "";
 
-  const videoId =
-    concept.video || pasted || sessionVideoId || auto.videoId || DEMO_VIDEO_ID || "";
-
-  // No curated id yet? Send the student to a real YouTube search scoped to their
-  // class, subject and concept rather than to a dead embed.
-  const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(
-    [
-      "Samacheer Kalvi",
-      classItem ? `class ${classItem.id}` : "",
-      subject ? subject.name : "",
-      concept.name,
-      lang === "ta" ? "Tamil" : "",
-    ]
-      .filter(Boolean)
-      .join(" ")
-  )}`;
-
-  // If the concept has no curated id, ask the server to find an embeddable one.
-  // The query itself is the guard, so this fires once per concept and is not
-  // restarted by its own state updates.
-  useEffect(() => {
-    if (concept.video || pasted || sessionVideoId || DEMO_VIDEO_ID) return;
-
-    const query = [
-      "Samacheer Kalvi",
-      classItem ? `class ${classItem.id}` : "",
-      subject ? subject.name : "",
-      concept.name,
-      lang === "ta" ? "Tamil" : "",
-    ]
-      .filter(Boolean)
-      .join(" ");
-
-    if (requested.current === query) return;
-    requested.current = query;
-
-    setAuto({ status: "loading" });
-
-    // No cancellation flag here on purpose. React StrictMode runs effects twice in
-    // development: the first pass would set the flag in its cleanup and the response
-    // from that pass would be thrown away, leaving the player loading forever.
-    fetch(`/api/youtube?q=${encodeURIComponent(query)}`)
-      .then((r) => (r.ok ? r.json() : { configured: true, error: `HTTP ${r.status}` }))
-      .then((d) => {
-        if (!d.configured) setAuto({ status: "unconfigured" });
-        else if (d.videoId) setAuto({ status: "ready", ...d });
-        else setAuto({ status: "empty", note: d.error });
-      })
-      .catch(() => setAuto({ status: "error" }));
-  }, [concept.video, concept.name, classItem, subject, lang, pasted]);
+  // The slot takes either a file in /public or an 11-character YouTube id, and
+  // the leading slash is what separates them. Self-hosted files are the better
+  // option for a demo: nothing to load over the network, no branding, no
+  // suggested videos at the end, and it still works on bad conference wifi.
+  const isFile = source.startsWith("/");
+  const videoId = isFile ? "" : source;
 
   // One shape for both cases: a worked sum gives [line, note] rows, and a concept
   // without one falls back to its three step sentences with no note.
@@ -240,7 +175,24 @@ export default function AvPlayer({ concept, classItem, subject, onClose, web = f
         </div>
       ) : showVideo ? (
         <div className="w-full overflow-hidden rounded-2xl border border-nightLine bg-black">
-          {videoId ? (
+          {isFile ? (
+            /* A file served from /public. `key` on the source forces a reload when
+               the student moves to the next concept: without it React keeps the
+               same element and carries on playing the previous video. */
+            <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
+              <video
+                key={source}
+                className="absolute inset-0 h-full w-full"
+                controls
+                autoPlay
+                playsInline
+                preload="metadata"
+                poster={concept.videoPoster ?? undefined}
+              >
+                <source src={source} type="video/mp4" />
+              </video>
+            </div>
+          ) : videoId ? (
             <>
               <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
                 <iframe
@@ -252,57 +204,17 @@ export default function AvPlayer({ concept, classItem, subject, onClose, web = f
                   referrerPolicy="strict-origin-when-cross-origin"
                 />
               </div>
-              {auto.status === "ready" && !concept.video && !pasted ? (
-                <p className="truncate px-3 py-2 text-[10.5px] text-white/45">{auto.channel}</p>
-              ) : null}
             </>
-          ) : auto.status === "loading" ? (
-            <div className="flex flex-col items-center gap-3 px-5 py-10">
-              <span className="flex h-4 items-end gap-1" aria-hidden>
-                {[0, 1, 2, 3].map((i) => (
-                  <span
-                    key={i}
-                    className="wave-bar w-[3px] rounded-full bg-cyan"
-                    style={{ height: "16px", animationDelay: `${i * 90}ms` }}
-                  />
-                ))}
-              </span>
-              <p className="text-[12px] text-white/50">{t("findingVideo", lang)}</p>
-            </div>
           ) : (
-            <div className="flex flex-col items-center gap-3 px-5 py-7 text-center">
+            <div className="flex flex-col items-center gap-2 px-5 py-9 text-center">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden className="text-white/35">
                 <rect x="3" y="5" width="18" height="14" rx="4" stroke="currentColor" strokeWidth="1.6" />
                 <path d="M10 9.5v5l4.5-2.5z" fill="currentColor" />
               </svg>
-              <p className="text-[12px] leading-relaxed text-white/50">{t("noVideoYet", lang)}</p>
-              <a
-                href={searchUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full rounded-full bg-white py-2 text-center font-display text-[12px] font-bold text-ink transition hover:bg-white/90"
-              >
-                {t("searchYouTube", lang)}
-              </a>
-              <div className="flex w-full items-center gap-2">
-                <input
-                  value={linkField}
-                  onChange={(e) => setLinkField(e.target.value)}
-                  placeholder="Paste a YouTube link"
-                  className="min-w-0 flex-1 rounded-full border border-white/25 bg-white/5 px-3 py-2 text-[11.5px] text-white outline-none placeholder:text-white/35"
-                />
-                <button
-                  onClick={() => {
-                    const id = parseYouTube(linkField);
-                    if (!id) return;
-                    sessionVideoId = id;
-                    setPasted(id);
-                  }}
-                  className="shrink-0 rounded-full bg-white px-3 py-2 font-display text-[11.5px] font-bold text-ink transition hover:bg-white/90"
-                >
-                  {t("play", lang)}
-                </button>
-              </div>
+              <p className="font-display text-[13px] font-bold leading-snug text-white/80">
+                {t("noVideoYet", lang)}
+              </p>
+              <p className="text-[11.5px] leading-relaxed text-white/45">{t("noVideoNote", lang)}</p>
             </div>
           )}
         </div>

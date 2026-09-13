@@ -5,6 +5,7 @@ import {
   CLASSES,
   GROUPS,
   classTotals,
+  countConcepts,
   getChapters,
   hasGroups,
   subjectsFor,
@@ -403,6 +404,10 @@ export default function WebDemo({ toolbar = null }) {
                           </span>
                           <span className="block text-[12px] text-inkSoft">
                             {getChapters(classItem.id, s.id).length} {t("chapters", lang)}
+                            <span className="px-1.5 text-line" aria-hidden>
+                              |
+                            </span>
+                            {countConcepts(classItem.id, s.id)} {t("concepts", lang)}
                           </span>
                         </span>
                       </button>

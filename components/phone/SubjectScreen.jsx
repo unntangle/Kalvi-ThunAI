@@ -37,13 +37,33 @@ export default function SubjectScreen({ dir, classItem, group, onBack, onPick })
                 <span className="block truncate font-display text-[16px] font-bold leading-tight text-ink">
                   {subjectName(s, lang)}
                 </span>
-              </span>
-              <span className="shrink-0 text-right">
-                <span className="block font-display text-[15px] font-bold text-ink">
-                  {getChapters(classItem.id, s.id).length}
+                {/* Chapters and concepts on one line rather than as a stacked
+                    figure on the right. A chapter count alone says nothing about
+                    how much is actually inside it. */}
+                <span className="mt-0.5 block truncate text-[11.5px] text-inkSoft">
+                  {getChapters(classItem.id, s.id).length} {t("chapters", lang)}
+                  <span className="px-1.5 text-line" aria-hidden>
+                    |
+                  </span>
+                  {countConcepts(classItem.id, s.id)} {t("concepts", lang)}
                 </span>
-                <span className="block text-[10.5px] text-inkFaint">{t("chapters", lang)}</span>
               </span>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden
+                className="shrink-0 text-inkFaint"
+              >
+                <path
+                  d="m9 5 7 7-7 7"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </button>
           ))}
         </div>

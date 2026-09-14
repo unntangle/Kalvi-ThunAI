@@ -23,7 +23,7 @@ export const maths = [
   // chapter, so the richest material is what a student meets first. The rest of
   // the chapter follows in textbook order behind them.
   ["Relations and Functions", [
-    ["Cartesian product", "Pairing every element of one set with every element of another builds the product set.", "n(A × B) = n(A) × n(B)", "A has 3 elements, B has 4 | Every a pairs with every b | A × B holds 12 ordered pairs", "grid", null, {
+    ["Cartesian product", "Pairing every element of one set with every element of another builds the product set.", "n(A × B) = n(A) × n(B)", "A has 3 elements, B has 4 | Every a pairs with every b | A × B holds 12 ordered pairs", "grid", "/videos/Cartesian%20product.mp4", {
       figures: ["cartesian-grid", "cartesian-tree"],
       deeper: "The order inside a pair is part of the pair. (1, 2) and (2, 1) are different elements, so A × B and B × A are different sets unless A and B are the same. This is also where the rest of the chapter comes from: a relation is any subset of A × B, and a function is a subset with one extra condition on it.",
       mistake: "Treating A × B and B × A as the same set. They are the same size, but not the same elements.",
